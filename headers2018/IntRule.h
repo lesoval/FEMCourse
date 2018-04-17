@@ -29,26 +29,21 @@ public:
     //Default Constructor of integration rule
     IntRule();
     
-    
     IntRule(int order);
     
     ~IntRule();
-    
-    virtual void operator=(const IntRule &copy);
+
+	void SetOrder(int order);
+   
+    void operator=(const IntRule &copy);
     
     IntRule(const IntRule &copy);
-    
-    virtual void SetOrder(int order)
-    {
-        fOrder=order;
-        
-    }
-    
+		        
     virtual int NPoints() const;
     
-    virtual void Point(int p, TVec<double> &co, double &weight) const;
+    virtual void Point(int p, VecDouble &co, double &weight);
     
-    void Print(std::ostream &out) const;
+    virtual void Print(std::ostream &out) const;
     
 };
 

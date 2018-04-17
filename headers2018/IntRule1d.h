@@ -21,10 +21,14 @@ public:
     IntRule1d();
     
     IntRule1d(int order);
-    
-    virtual void SetOrder(int order);
+
+	int NPoints() const;
+
+	void Point(int p, VecDouble &co, double &weight);
+
+	void Print(std::ostream &out) const;
         
-    void gauleg(const double x1, const double x2, TVecNum<double> &x, TVecNum<double> &w);
+    void gauleg(const double x1, const double x2, TMatrix &x, VecDouble &w);
     
 };
 

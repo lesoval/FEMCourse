@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include "DataTypes.h"
+#include "IntRule.h"
 
 class IntRuleQuad : public IntRule
 {
@@ -22,9 +23,13 @@ public:
   
   IntRuleQuad(int order);
   
-  virtual void SetOrder(int order);
+  int NPoints() const;
+
+  void Point(int p, VecDouble &co, double &weight);
+
+  void Print(std::ostream &out) const;
    
-  void gaulegQuad(const double x1, const double x2, VecDouble&x, VecDouble &w);
+  void gaulegQuad(const double x1, const double x2, TMatrix &x, VecDouble &w);
 
 };
 

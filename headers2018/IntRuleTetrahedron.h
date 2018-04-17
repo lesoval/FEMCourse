@@ -10,21 +10,22 @@
 #define __FemSC__IntRuleTetrahedron__
 
 #include <stdio.h>
-#include "TVec.h"
-#include "TMatrix.h"
+#include "IntRule.h"
 
 class IntRuleTetrahedron : public IntRule
 {
-  
-    
+      
 public:
   
   IntRuleTetrahedron();
   
   IntRuleTetrahedron(int order);
   
-  virtual void SetOrder(int order);
-    
+  int NPoints() const;
+
+  void Point(int p, VecDouble &co, double &weight);
+
+  void Print(std::ostream &out) const;
 };
 
 
