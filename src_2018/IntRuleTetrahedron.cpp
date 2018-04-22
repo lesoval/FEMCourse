@@ -1,71 +1,18 @@
-#include <iomanip>
-#include <math.h>
+/*
+*  IntRuleTriangle.cpp
+*
+*  Created by Leandro Valdez on 5/4/18.
+*
+*/
+
 #include "IntRuleTetrahedron.h"
 #include "tpanic.h"
 
 IntRuleTetrahedron::IntRuleTetrahedron() :IntRule() {}
 
-IntRuleTetrahedron::IntRuleTetrahedron(int order) : IntRule(order) {}
-
-int IntRuleTetrahedron::NPoints() const
+IntRuleTetrahedron::IntRuleTetrahedron(int order)
 {
-	int npoints;
-
-	if (fOrder<0 || fOrder > 5)
-	{
-		DebugStop();
-	}
-
-	if (fOrder == 0 || fOrder == 1)
-	{
-		npoints = 1;
-	}
-
-	if (fOrder == 2)
-	{
-		npoints = 4;
-	}
-
-	if (fOrder == 3)
-	{
-		npoints = 5;
-	}
-
-	if (fOrder == 4)
-	{
-		npoints = 11;
-	}
-
-	if (fOrder == 5)
-	{
-		npoints = 15;
-	}
-
-	return npoints;
-}
-
-void IntRuleTetrahedron::Print(std::ostream &out) const
-{
-	out << "ORDER	" << fOrder << "	NPoints	" << NPoints() << "\n" << std::endl;
-
-	for (int i = 0; i < NPoints(); i++)
-	{
-		VecDouble co(NPoints());
-		double weight;
-		IntRuleTetrahedron T(fOrder);
-		T.Point(i, co, weight);
-		std::cout << std::setprecision(12) << std::fixed;
-		out << "POINT	" << i << "	POS {" << co[0] << ", " << co[1] << ", " << co[2]
-			<< "}	WEIGHT " << weight << std::endl;
-	}
-}
-
-void IntRuleTetrahedron::Point(int p, VecDouble &co, double &weight)
-{
-	if (p<0 || p >= NPoints())
-	{
-		DebugStop();
-	}
+	SetOrder(order);
 
 	if (fOrder == 0 || fOrder == 1) {
 
@@ -137,11 +84,14 @@ void IntRuleTetrahedron::Point(int p, VecDouble &co, double &weight)
 		fPoints.PutVal(13, 0, 0.433449846426336);  fPoints.PutVal(13, 1, 0.066550153573664); fPoints.PutVal(13, 2, 0.433449846426336); fWeights[13] = 0.010949141561386;
 		fPoints.PutVal(14, 0, 0.433449846426336);  fPoints.PutVal(14, 1, 0.433449846426336); fPoints.PutVal(14, 2, 0.066550153573664); fWeights[14] = 0.010949141561386;
 	}
+}
 
-	co.resize(3);
+void IntRuleTetrahedron::SetOrder(int order)
+{
+	if (order < 0 || order > 5)
+	{
+		DebugStop();
+	}
 
-	co[0] = fPoints.GetVal(p, 0);
-	co[1] = fPoints.GetVal(p, 1);
-	co[2] = fPoints.GetVal(p, 2);
-	weight = fWeights[p];
+	fOrder = order;
 }

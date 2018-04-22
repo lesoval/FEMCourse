@@ -5,6 +5,7 @@
  *
  */
 
+#include <iomanip>
 #include "IntRule.h"
 #include "tpanic.h"
 
@@ -20,11 +21,6 @@ IntRule::IntRule(int order)
 }
 
 IntRule::~IntRule(void){}
-
-void IntRule::SetOrder(int order)
-{
-	fOrder = order;
-}
 
 void IntRule::operator=(const IntRule &copy)
 {
@@ -42,12 +38,44 @@ IntRule::IntRule(const IntRule &copy)
 
 int IntRule::NPoints() const
 {
-	return 0;
+	return fPoints.Rows();
 }
 
-void IntRule::Point(int p, VecDouble &co, double &weight){}
+void IntRule::Point(int p, VecDouble &co, double &weight) const
+{
+	if (p<0 || p >= NPoints())
+	{
+		DebugStop();
+	}
+
+	for (int i = 0; i < fPoints.Cols(); i++)
+	{
+		co[i] = fPoints.GetVal(p, i);
+	}
+
+	weight = fWeights[p];
+	
+}
 
 void IntRule::Print(std::ostream &out) const
 {
 	out << "ORDER	" << fOrder << "	NPoints	" << NPoints() << "\n" << std::endl;
+
+	for (int i = 0; i < NPoints(); i++)
+	{
+		VecDouble co(NPoints());
+		double weight;
+		Point(i, co, weight);
+		std::cout << std::setprecision(12) << std::fixed;
+		out << "POINT	" << i << "	POS {";
+		for (int j = 0; j < fPoints.Cols(); j++)
+		{
+			if (j!=0)
+			{
+				out << ", ";
+			}
+			out << co[j];
+		}
+		out << "}	WEIGHT " << weight << std::endl;
+	}
 }

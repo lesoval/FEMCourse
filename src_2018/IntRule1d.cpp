@@ -5,16 +5,16 @@
 *
 */
 
-#include <iomanip>
 #include "IntRule1d.h"
 #include "tpanic.h"
 
 IntRule1d::IntRule1d():IntRule(){}
 
-IntRule1d::IntRule1d(int order) :IntRule(order){}
-
-int IntRule1d::NPoints() const
+IntRule1d::IntRule1d(int order)
 {
+	SetOrder(order);
+
+	// Calcula o número de pontos necessários para integração
 	int npoints, resto;
 	resto = fOrder % 2;
 
@@ -26,47 +26,36 @@ int IntRule1d::NPoints() const
 	{
 		npoints = (fOrder + 2) / 2;	//para fOrder par
 	}
-	return npoints;
+
+	//Calcula os pontos e pesos básicos de Gauss
+	VecDouble points(npoints);
+
+	fPoints.Resize(npoints, 1);
+	fWeights.resize(npoints);
+
+	gauleg(-1, 1, points, fWeights);
+
+	for (int i = 0; i < npoints; i++)
+	{
+		fPoints.PutVal(i, 0, points[i]);
+	}
 }
 
-void IntRule1d::Point(int p, VecDouble &co, double &weight)
+void IntRule1d::SetOrder(int order)
 {
-	fPoints.Resize(NPoints(), 1);
-	fWeights.resize(NPoints());
-
-	if (p<0 || p >= NPoints())
+	if (order<0)
 	{
 		DebugStop();
 	}
 
-	gauleg(-1, 1, fPoints, fWeights);
-
-	co.resize(1);
-
-	co[0] = fPoints.GetVal(p,0);
-	weight = fWeights[p];
+	fOrder = order;
 }
 
-void IntRule1d::Print(std::ostream &out) const
-{
-	out << "ORDER	" << fOrder << "	NPoints	" << NPoints() << "\n" << std::endl;
-
-	for (int i = 0; i < NPoints(); i++)
-	{
-		VecDouble co(NPoints());
-		double weight;
-		IntRule1d T(fOrder);
-		T.Point(i, co, weight);
-		std::cout << std::setprecision(12) << std::fixed;
-		out << "POINT	" << i << "	POS " << co[0] << "	WEIGHT " << weight << std::endl;
-	}
-}
-
-void IntRule1d::gauleg(const double x1, const double x2, TMatrix &x, VecDouble &w)
+void IntRule1d::gauleg(const double x1, const double x2, VecDouble &x, VecDouble &w)
 {
 	const double EPS = 1.0e-14;
 	double z1, z, xm, xl, pp, p3, p2, p1;
-	int n = x.Rows();
+	int n = x.size();
 	int m = (n + 1) / 2;
 	xm = 0.5*(x2 + x1);
 	xl = 0.5*(x2 - x1);
@@ -85,8 +74,8 @@ void IntRule1d::gauleg(const double x1, const double x2, TMatrix &x, VecDouble &
 			z1 = z;
 			z = z1 - p1 / pp;
 		} while (abs(z - z1) > EPS);
-		x.PutVal(i,0, xm - xl * z);
-		x.PutVal(n - 1 - i,0, xm + xl * z);
+		x[i] = xm - xl * z;
+		x[n - 1 - i] = xm + xl * z;
 		w[i] = 2.0*xl / ((1.0 - z * z)*pp*pp);
 		w[n - 1 - i] = w[i];
 	}

@@ -5,144 +5,14 @@
 *
 */
 
-#include <iomanip>
-#include <math.h>
 #include "IntRuleTriangle.h"
 #include "tpanic.h"
 
 IntRuleTriangle::IntRuleTriangle() :IntRule() {}
 
-IntRuleTriangle::IntRuleTriangle(int order) : IntRule(order) {}
-
-int IntRuleTriangle::NPoints() const
+IntRuleTriangle::IntRuleTriangle(int order)
 {
-	int npoints;
-
-	if (fOrder<0 || fOrder > 19)
-	{
-		DebugStop();
-	}
-
-	if (fOrder == 0) {
-
-		npoints = 1;
-	}
-
-	if (fOrder == 1 || fOrder == 2) {
-
-		npoints = 3;
-	}
-
-	if (fOrder == 3) {
-
-		npoints = 6;
-	}
-
-	if (fOrder == 4) {
-
-		npoints = 6;
-	}
-
-	if (fOrder == 5) {
-
-		npoints = 7;
-	}
-
-	if (fOrder == 6) {
-
-		npoints = 12;
-	}
-	
-	if (fOrder == 7) {
-
-		npoints = 15;
-	}
-
-	if (fOrder == 8) {
-
-		npoints = 16;
-	}
-
-	if (fOrder == 9) {
-
-		npoints = 19;
-	}
-
-	if (fOrder == 10) {
-
-		npoints = 25;
-	}
-
-	if (fOrder == 11) {
-
-		npoints = 28;
-	}
-
-	if (fOrder == 12) {
-
-		npoints = 33;
-	}
-
-	if (fOrder == 13) {
-
-		npoints = 37;
-	}
-
-	if (fOrder == 14) {
-
-		npoints = 46;
-	}
-
-	if (fOrder == 15) {
-
-		npoints = 52;
-	}
-
-	if (fOrder == 16) {
-
-		npoints = 55;
-	}
-
-	if (fOrder == 17) {
-
-		npoints = 61;
-	}
-
-	if (fOrder == 18) {
-
-		npoints = 72;
-	}
-
-	if (fOrder == 19) {
-
-		npoints = 73;
-	}
-
-	return npoints;
-}
-
-void IntRuleTriangle::Print(std::ostream &out) const
-{
-	out << "ORDER	" << fOrder << "	NPoints	" << NPoints() << "\n" << std::endl;
-
-	for (int i = 0; i < NPoints(); i++)
-	{
-		VecDouble co(NPoints());
-		double weight;
-		IntRuleTriangle T(fOrder);
-		T.Point(i, co, weight);
-		std::cout << std::setprecision(12) << std::fixed;
-		out << "POINT	" << i << "	POS {" << co[0] << ", " << co[1]
-			<< "}	WEIGHT " << weight << std::endl;
-	}
-}
-
-void IntRuleTriangle::Point(int p, VecDouble &co, double &weight)
-{
-	if (p<0 || p >= NPoints())
-	{
-		DebugStop();
-	}
+	SetOrder(order);
 
 	if (fOrder == 0) {
 
@@ -151,7 +21,7 @@ void IntRuleTriangle::Point(int p, VecDouble &co, double &weight)
 
 		fPoints.PutVal(0, 0, 0.33333333333333331);  fPoints.PutVal(0, 1, 0.33333333333333331);  fWeights[0] = 0.5;
 	}
-	
+
 	if (fOrder == 1 || fOrder == 2) {
 
 		fPoints.Resize(3, 2);
@@ -248,7 +118,7 @@ void IntRuleTriangle::Point(int p, VecDouble &co, double &weight)
 		fPoints.PutVal(13, 0, 0.76122274802452383);   fPoints.PutVal(13, 1, 0.04627087779880891);        fWeights[13] = 0.028060072141687677;
 		fPoints.PutVal(14, 0, 0.04627087779880891);    fPoints.PutVal(14, 1, 0.76122274802452383);       fWeights[14] = 0.028060072141687677;
 	}
-	
+
 	if (fOrder == 8) {
 
 		fPoints.Resize(16, 2);
@@ -297,7 +167,7 @@ void IntRuleTriangle::Point(int p, VecDouble &co, double &weight)
 		fPoints.PutVal(17, 0, 0.74119859878449801);        fPoints.PutVal(17, 1, 0.22196298916076571);     fWeights[17] = 0.021641769688644688;
 		fPoints.PutVal(18, 0, 0.22196298916076571);        fPoints.PutVal(18, 1, 0.74119859878449801);     fWeights[18] = 0.021641769688644688;
 	}
-	
+
 	if (fOrder == 10) {
 
 		fPoints.Resize(25, 2);
@@ -329,7 +199,7 @@ void IntRuleTriangle::Point(int p, VecDouble &co, double &weight)
 		fPoints.PutVal(23, 0, 0.12280457706855927); 	fPoints.PutVal(23, 1, 0.033371833739304788);    fWeights[23] = 0.013474676295939981;
 		fPoints.PutVal(24, 0, 0.033371833739304788);   fPoints.PutVal(24, 1, 0.12280457706855927);      fWeights[24] = 0.013474676295939981;
 	}
-	
+
 	if (fOrder == 11) {
 
 		fPoints.Resize(28, 2);
@@ -364,7 +234,7 @@ void IntRuleTriangle::Point(int p, VecDouble &co, double &weight)
 		fPoints.PutVal(26, 0, 0.64047231013486527);    fPoints.PutVal(26, 1, 0.31178371570959901);      fWeights[26] = 0.02036399822914952;
 		fPoints.PutVal(27, 0, 0.31178371570959901); 	fPoints.PutVal(27, 1, 0.64047231013486527);      fWeights[27] = 0.02036399822914952;
 	}
-	
+
 	if (fOrder == 12) {
 
 		fPoints.Resize(33, 2);
@@ -404,7 +274,7 @@ void IntRuleTriangle::Point(int p, VecDouble &co, double &weight)
 		fPoints.PutVal(31, 0, 0.60894323577978782);    fPoints.PutVal(31, 1, 0.27571326968551418);      fWeights[31] = 0.020185778883190463;
 		fPoints.PutVal(32, 0, 0.27571326968551418);    fPoints.PutVal(32, 1, 0.60894323577978782);      fWeights[32] = 0.020185778883190463;
 	}
-	
+
 	if (fOrder == 13) {
 
 		fPoints.Resize(37, 2);
@@ -448,7 +318,7 @@ void IntRuleTriangle::Point(int p, VecDouble &co, double &weight)
 		fPoints.PutVal(35, 0, 0.72235779312418802);    fPoints.PutVal(35, 1, 0.27251581777342965);     fWeights[35] = 0.0047953405017716316;
 		fPoints.PutVal(36, 0, 0.27251581777342965);    fPoints.PutVal(36, 1, 0.72235779312418802);     fWeights[36] = 0.0047953405017716316;
 	}
-	
+
 	if (fOrder == 14) {
 
 		fPoints.Resize(46, 2);
@@ -502,7 +372,7 @@ void IntRuleTriangle::Point(int p, VecDouble &co, double &weight)
 		fPoints.PutVal(45, 0, 0.071165710877750768);   fPoints.PutVal(45, 1, 0.91420998492962546);       fWeights[45] = 0.0034823316867592063;
 
 	}
-	
+
 	if (fOrder == 15) {
 
 		fPoints.Resize(52, 2);
@@ -562,7 +432,7 @@ void IntRuleTriangle::Point(int p, VecDouble &co, double &weight)
 		fPoints.PutVal(51, 0, 0.073055996479186494);      fPoints.PutVal(51, 1, 0.91607564403173114);      fWeights[51] = 0.0023071532644835515;
 
 	}
-	
+
 	if (fOrder == 16) {
 
 		fPoints.Resize(55, 2);
@@ -624,7 +494,7 @@ void IntRuleTriangle::Point(int p, VecDouble &co, double &weight)
 		fPoints.PutVal(53, 0, 0.90639484399204151);    fPoints.PutVal(53, 1, 0.077194371295755432);    fWeights[53] = 0.0036498984697158812;
 		fPoints.PutVal(54, 0, 0.077194371295755432);   fPoints.PutVal(54, 1, 0.90639484399204151);     fWeights[54] = 0.0036498984697158812;
 	}
-	
+
 	if (fOrder == 17) {
 
 		fPoints.Resize(61, 2);
@@ -692,7 +562,7 @@ void IntRuleTriangle::Point(int p, VecDouble &co, double &weight)
 		fPoints.PutVal(59, 0, 0.59886879088323808);    fPoints.PutVal(59, 1, 0.30358518307132609);       fWeights[59] = 0.013722186996229164;
 		fPoints.PutVal(60, 0, 0.30358518307132609);    fPoints.PutVal(60, 1, 0.59886879088323808);       fWeights[60] = 0.013722186996229164;
 	}
-	
+
 	if (fOrder == 18) {
 
 		fPoints.Resize(72, 2);
@@ -771,7 +641,7 @@ void IntRuleTriangle::Point(int p, VecDouble &co, double &weight)
 		fPoints.PutVal(70, 0, 0.012710460572255469);   fPoints.PutVal(70, 1, 0.93934508764373181);     fWeights[70] = 0.0021634287304382093;
 		fPoints.PutVal(71, 0, 0.93934508764373181);    fPoints.PutVal(71, 1, 0.012710460572255469);    fWeights[71] = 0.0021634287304382093;
 	}
-	
+
 	if (fOrder == 19) {
 
 		fPoints.Resize(73, 2);
@@ -851,10 +721,14 @@ void IntRuleTriangle::Point(int p, VecDouble &co, double &weight)
 		fPoints.PutVal(71, 0, 0.92434425262078401); fPoints.PutVal(71, 1, 0.065494628082937698); fWeights[71] = 0.001899964427650957;
 		fPoints.PutVal(72, 0, 0.065494628082937698); fPoints.PutVal(72, 1, 0.92434425262078401); fWeights[72] = 0.001899964427650957;
 	}
+}
 
-	co.resize(2);
+void IntRuleTriangle::SetOrder(int order)
+{
+	if (order < 0 || order > 19)
+	{
+		DebugStop();
+	}
 
-	co[0] = fPoints.GetVal(p, 0);
-	co[1] = fPoints.GetVal(p, 1);
-	weight = fWeights[p];
+	fOrder = order;
 }
