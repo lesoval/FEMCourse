@@ -10,22 +10,23 @@
 #define __FemSC__IntRuleTetrahedron__
 
 #include <stdio.h>
+#include "TMatrix.h"
 #include "IntRule.h"
 
 class IntRuleTetrahedron : public IntRule
 {
-      
-public:
   
-  IntRuleTetrahedron();
-  
-  IntRuleTetrahedron(int order);
-  
-  int NPoints() const;
+    public:
+    
+    // Default Constructor of integration rule for tetrahedron elements
+    IntRuleTetrahedron();
+    
+    // Constructor of integration rule for tetrahedron elements
+    IntRuleTetrahedron(int order);
 
-  void Point(int p, VecDouble &co, double &weight);
-
-  void Print(std::ostream &out) const;
+    // Method to set polynomial order of the integration rule for tetrahedro elements
+    virtual void SetOrder(int order);
+    
 };
 
 

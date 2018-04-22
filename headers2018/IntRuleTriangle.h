@@ -10,22 +10,24 @@
 #define __FemSC__IntRuleTriangle__
 
 #include <stdio.h>
+#include "DataTypes.h"
 #include "IntRule.h"
+
 
 class IntRuleTriangle : public IntRule
 {
   
-public:
+    public:
   
-  IntRuleTriangle();
+    // Default Constructor of integration rule for triangle elements
+    IntRuleTriangle();
   
-  IntRuleTriangle(int order);
+    // Constructor of integration rule for triangle elements
+    IntRuleTriangle(int order);
   
-  int NPoints() const;
-
-  void Point(int p, VecDouble &co, double &weight);
-
-  void Print(std::ostream &out) const;  
+    // Method to set polynomial order of the integration rule for triangle elements
+    virtual void SetOrder(int order);
+  
 };
 
 
