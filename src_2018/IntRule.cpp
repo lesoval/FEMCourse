@@ -1,7 +1,7 @@
 /*
  *  IntRule.cpp
  *
- *  Created by Leandro Valdez on 5/4/18.
+ *  Created by Leandro Valdez on 4/5/18.
  *
  */
 
@@ -29,11 +29,10 @@ void IntRule::operator=(const IntRule &copy)
 	fWeights = copy.fWeights;
 }
 
-IntRule::IntRule(const IntRule &copy)
+IntRule::IntRule(const IntRule &copy) :
+	fOrder(copy.fOrder), fPoints(copy.fPoints), fWeights(copy.fWeights)
 {
-	fOrder = copy.fOrder;
-	fPoints = copy.fPoints;
-	fWeights = copy.fWeights;
+
 }
 
 int IntRule::NPoints() const

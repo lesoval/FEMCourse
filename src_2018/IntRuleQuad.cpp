@@ -1,7 +1,7 @@
 /*
-*  IntRule.cpp
+*  IntRuleQuad.cpp
 *
-*  Created by Leandro Valdez on 5/4/18.
+*  Created by Leandro Valdez on 4/5/18.
 *
 */
 

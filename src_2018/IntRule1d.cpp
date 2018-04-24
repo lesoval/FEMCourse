@@ -1,7 +1,7 @@
 /*
-*  IntRule.cpp
+*  IntRule1d.cpp
 *
-*  Created by Leandro Valdez on 5/4/18.
+*  Created by Leandro Valdez on 4/5/18.
 *
 */
 
@@ -14,7 +14,7 @@ IntRule1d::IntRule1d(int order)
 {
 	SetOrder(order);
 
-	// Calcula o número de pontos necessários para integração
+	// Define o número de pontos necessários para integração
 	int npoints, resto;
 	resto = fOrder % 2;
 
