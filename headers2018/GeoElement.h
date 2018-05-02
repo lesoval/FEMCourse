@@ -44,6 +44,9 @@ public:
     
     // Return number of nodes
     virtual int NNodes() = 0;
+    
+    // Return number of sides
+    virtual int NSides() = 0;
 
     // Return the index of an element nodes
     virtual int NodeIndex(int node) = 0;

@@ -5,6 +5,8 @@
 //  Created by Philippe Devloo on 16/04/18.
 //
 
+#include "GeoElement.h"
+
 #ifndef GeoElementSide_h
 #define GeoElementSide_h
 
@@ -26,7 +28,7 @@ public:
     // Constructor of GeoElementSide
     GeoElementSide(GeoElement *element, int side) : fElement(element), fSide(side)
     {
-        
+
     }
     
     // Copy constructor of GeoElementSide

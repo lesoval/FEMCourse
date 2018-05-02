@@ -19,8 +19,18 @@ class GeoNode
 public:
     
     // Constructor of GeoNode
+    GeoNode(){
+        
+    }
+    
+    // Constructor of GeoNode
     GeoNode(VecDouble &co) : xco(co)
     {
+        
+    }
+    
+    // Destructor of GeoNode
+    ~GeoNode(){
         
     }
     

@@ -50,9 +50,16 @@ public:
         return Geom.NumNodes();
     }
     
+    // Return the number of nodes of a given element
+    virtual int NSides()
+    {
+        return TGeom::nSides;
+    }
+    
     // Return the index of an element node
     virtual int NodeIndex(int node)
     {
+        if(node<0 || node>=Geom.NumNodes()) return -1;
         return Geom.NodeIndex(node);
     }
     
