@@ -12,18 +12,31 @@ GeomTriangle::GeomTriangle() {}
 
 GeomTriangle::~GeomTriangle() {}
 
-GeomTriangle::GeomTriangle(const GeomTriangle &copy) :fNodeIndices(copy.fNodeIndices) {}
+GeomTriangle::GeomTriangle(const GeomTriangle &copy)
+{
+	this->operator =(copy);
+}
 
 GeomTriangle &GeomTriangle::operator=(const GeomTriangle &copy)
 {
+	fNodeIndices = copy.fNodeIndices;
+
+	for (int i = 0; i<nSides; i++)
+	{
+		fNeighbours[i] = copy.fNeighbours[i];
+	}
+
 	return *this;
 }
 
 void GeomTriangle::Shape(const VecDouble &xi, VecDouble &phi, TMatrix &dphi)
 {
-	phi[0] = 1 - xi[0] - xi[1];
-	phi[1] = xi[0];
-	phi[2] = xi[1];
+	double ksi = xi[0];
+	double eta = xi[1];
+
+	phi[0] = 1 - ksi - eta;
+	phi[1] = ksi;
+	phi[2] = eta;
 
 	dphi(0, 0) = -1;	dphi(1, 0) = -1;
 	dphi(0, 1) = 1;		dphi(1, 1) = 0;
@@ -32,11 +45,35 @@ void GeomTriangle::Shape(const VecDouble &xi, VecDouble &phi, TMatrix &dphi)
 
 void GeomTriangle::X(const VecDouble &xi, TMatrix &NodeCo, VecDouble &x)
 {
-	
+	int nRows = NodeCo.Rows();
+	int nCols = NodeCo.Cols();
+
+	VecDouble phi(3);
+	TMatrix dphi(2, 3);
+	Shape(xi, phi, dphi);
+
+	for (int i = 0; i < nRows; i++)
+	{
+		x[i] = 0;
+		for (int j = 0; j < nCols; j++)
+		{
+			x[i] += phi[j] * NodeCo.GetVal(i, j);
+		}
+	}
 }
 
 void GeomTriangle::GradX(const VecDouble &xi, Matrix &NodeCo, VecDouble &x, Matrix &gradx)
 {
+	int nRows = NodeCo.Rows();
+	int nCols = NodeCo.Cols();
+
+	if (nCols != 3)
+	{
+		std::cout << "GeomTriangle::GradX --> Objects of incompatible lengths, gradient cannot be computed." << std::endl;
+		std::cout << "Nodes matrix must be spacex3." << std::endl;
+		DebugStop();
+	}
+
 	gradx.Resize(NodeCo.Rows(), 2);
 	gradx.Zero();
 

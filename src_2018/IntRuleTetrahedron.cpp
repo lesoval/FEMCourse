@@ -560,6 +560,7 @@ void IntRuleTetrahedron::SetOrder(int order)
 {
 	if (order < 0 || order > 14)
 	{
+		std::cout << "IntRuleTetrahedron::SetOrder --> Invalid argument 'order'" << std::endl;
 		DebugStop();
 	}
 

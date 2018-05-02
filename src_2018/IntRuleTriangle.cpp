@@ -810,6 +810,7 @@ void IntRuleTriangle::SetOrder(int order)
 {
 	if (order < 0 || order > 21)
 	{
+		std::cout << "IntRuleTriangle::SetOrder --> Invalid argument 'order'" << std::endl;
 		DebugStop();
 	}
 

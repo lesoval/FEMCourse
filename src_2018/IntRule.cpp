@@ -15,24 +15,26 @@ IntRule::IntRule(int order)
 {
 	if (order<0)
 	{
+		std::cout << "IntRule::IntRule --> Invalid argument 'order'" << std::endl;
 		DebugStop();
 	}
 	SetOrder(order);
 }
 
-IntRule::~IntRule(void){}
+IntRule::~IntRule(){}
 
-void IntRule::operator=(const IntRule &copy)
+IntRule &IntRule::operator=(const IntRule &copy)
 {
 	fOrder = copy.fOrder;
 	fPoints = copy.fPoints;
 	fWeights = copy.fWeights;
+
+	return *this;
 }
 
-IntRule::IntRule(const IntRule &copy) :
-	fOrder(copy.fOrder), fPoints(copy.fPoints), fWeights(copy.fWeights)
+IntRule::IntRule(const IntRule &copy)
 {
-
+	this->operator =(copy);
 }
 
 int IntRule::NPoints() const
@@ -44,6 +46,7 @@ void IntRule::Point(int p, VecDouble &co, double &weight) const
 {
 	if (p<0 || p >= NPoints())
 	{
+		std::cout << "IntRule::Point --> Invalid argument 'p'" << std::endl;
 		DebugStop();
 	}
 

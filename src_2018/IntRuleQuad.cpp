@@ -52,6 +52,7 @@ void IntRuleQuad::SetOrder(int order)
 {
 	if (order<0)
 	{
+		std::cout << "IntRuleQuad::SetOrder --> Invalid argument 'order'" << std::endl;
 		DebugStop();
 	}
 

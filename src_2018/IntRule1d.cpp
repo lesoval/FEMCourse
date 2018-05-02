@@ -45,6 +45,7 @@ void IntRule1d::SetOrder(int order)
 {
 	if (order<0)
 	{
+		std::cout << "IntRule1d::SetOrder --> Invalid argument 'order'" << std::endl;
 		DebugStop();
 	}
 
