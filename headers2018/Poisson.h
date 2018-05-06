@@ -32,7 +32,7 @@ public:
     Poisson(const Poisson &copy);
     
     // Operator of copy
-    Poisson &operator=(const Poisson &copy) const;
+    Poisson &operator=(const Poisson &copy);
     
     // Method for creating a copy of the element
     virtual Poisson *Clone() const;

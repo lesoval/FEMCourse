@@ -58,7 +58,7 @@ public:
     GeoElement *Element(int elindex);
     
     // Build the connectivity of the grid
-    void BuildConnectivity();
+	void BuildConnectivity();
     
     // Function to print results
     void Print(std::ostream &out);

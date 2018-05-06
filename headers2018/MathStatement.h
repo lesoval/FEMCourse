@@ -28,7 +28,7 @@ public:
     MathStatement(const MathStatement &copy);
     
     // Operator of copy
-    MathStatement &operator=(const MathStatement &copy) const;
+    MathStatement &operator=(const MathStatement &copy);
     
     // Destructor of MathStatement
     virtual ~MathStatement();
@@ -37,7 +37,7 @@ public:
     virtual MathStatement *Clone() = 0;
     
     // Return the number of state variables
-    virtual int NState() const = 0;
+	virtual int NState() const = 0;
     
     // Method to implement integral over element's volume
     virtual void Contribute(IntPointData &integrationpointdata, Matrix &EK, Matrix &EF) const = 0;

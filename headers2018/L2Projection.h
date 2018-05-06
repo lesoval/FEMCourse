@@ -33,7 +33,7 @@ public:
     L2Projection(const L2Projection &copy);
     
     // Operator of copy
-    L2Projection &operator=(const L2Projection &copy) const;
+    L2Projection &operator=(const L2Projection &copy);
     
     // Method for creating a copy of the element
     virtual L2Projection *Clone() const;
@@ -60,7 +60,7 @@ public:
     }
     
     // Return the number of state variables
-    virtual int NState() const;
+	virtual int NState() const;
     
     // Method to implement integral over element's volume
     virtual void Contribute(IntPointData &integrationpointdata, Matrix &EK, Matrix &EF) const;

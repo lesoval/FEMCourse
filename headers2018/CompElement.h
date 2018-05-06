@@ -85,7 +85,7 @@ public:
     CompMesh *GetCompMesh() const;
     
     // Set a pointer to the element computational mesh
-    void SetCompMesh(CompMesh *mesh) const;
+    void SetCompMesh(CompMesh *mesh);
     
     // Initialize integration points data object
     void InitializeIntPointData(IntPointData &data) const;
