@@ -34,7 +34,7 @@ IntRule &IntRule::operator=(const IntRule &copy)
 
 IntRule::IntRule(const IntRule &copy)
 {
-	this->operator =(copy);
+	this->operator=(copy);
 }
 
 int IntRule::NPoints() const

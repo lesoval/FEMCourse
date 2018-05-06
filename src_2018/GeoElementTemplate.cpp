@@ -10,7 +10,6 @@
 #include "GeomQuad.h"
 #include "GeomTriangle.h"
 #include "GeomTetrahedron.h"
-#include "tpanic.h"
 
 template<class TGeom>
 GeoElementTemplate<TGeom>::GeoElementTemplate(const VecInt &nodeindices, int materialid, GeoMesh *gmesh) :GeoElement(materialid, gmesh)

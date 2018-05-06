@@ -123,6 +123,7 @@ int ShapeTriangle::NShapeFunctions(int side, VecInt &orders)
 		{
 			return (orders[side - 3] - 2)*(orders[side - 3] - 1);
 		}
+		break;
 	default:
 		std::cout << "ShapeTriangle::NShapeFunctions --> Invalid argument 'side' " << side << std::endl;
 		DebugStop();

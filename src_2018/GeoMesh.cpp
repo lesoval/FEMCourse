@@ -6,17 +6,16 @@
 */
 
 #include "GeoMesh.h"
-#include "tpanic.h"
 
 GeoMesh::GeoMesh(const GeoMesh &copy)
 {
-	this->operator =(copy);
+	this->operator=(copy);
 }
 
 GeoMesh &GeoMesh::operator=(const GeoMesh &copy)
 {
-	Elements = copy.Elements;
 	Nodes = copy.Nodes;
+	Elements = copy.Elements;
 
 	return *this;
 }
