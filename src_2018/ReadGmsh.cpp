@@ -202,7 +202,7 @@ void InsertElement(GeoMesh &gmesh, int elindex, std::ifstream & line){
             element_id--;
             TopolLine[0]--;
             TopolLine[1]--;
-            GeoElement *gel = new GeoElementTemplate< Geom1d> (TopolLine, matid, &gmesh);
+            GeoElement *gel = new GeoElementTemplate< Geom1d> (TopolLine, matid, &gmesh, elindex);
             gmesh.SetElement(element_id, gel);
             
         }
@@ -217,7 +217,7 @@ void InsertElement(GeoMesh &gmesh, int elindex, std::ifstream & line){
             TopolTriangle[0]--;
             TopolTriangle[1]--;
             TopolTriangle[2]--;
-            GeoElement *gel = new GeoElementTemplate< GeomTriangle> (TopolTriangle, matid, &gmesh);
+            GeoElement *gel = new GeoElementTemplate< GeomTriangle> (TopolTriangle, matid, &gmesh, elindex);
             gmesh.SetElement(element_id, gel);
 
         }
@@ -234,7 +234,7 @@ void InsertElement(GeoMesh &gmesh, int elindex, std::ifstream & line){
             TopolQuad[1]--;
             TopolQuad[2]--;
             TopolQuad[3]--;
-            GeoElement *gel = new GeoElementTemplate< GeomQuad> (TopolQuad, matid, &gmesh);
+            GeoElement *gel = new GeoElementTemplate< GeomQuad> (TopolQuad, matid, &gmesh, elindex);
             gmesh.SetElement(element_id, gel);
 
         }
@@ -251,7 +251,7 @@ void InsertElement(GeoMesh &gmesh, int elindex, std::ifstream & line){
             TopolTet[1]--;
             TopolTet[2]--;
             TopolTet[3]--;
-            GeoElement * gel = new GeoElementTemplate< GeomTetrahedron> (TopolTet, matid, &gmesh);
+            GeoElement * gel = new GeoElementTemplate< GeomTetrahedron> (TopolTet, matid, &gmesh, elindex);
             gmesh.SetElement(element_id, gel);
 
         }

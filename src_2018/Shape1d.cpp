@@ -8,11 +8,11 @@
 #include "Shape1d.h"
 #include "tpanic.h"
 
-void Shape1d::Shape(VecDouble &xi, VecInt &orders, VecDouble &phi, Matrix &dphi)
+void Shape1d::Shape(const VecDouble &xi, VecInt &orders, VecDouble &phi, Matrix &dphi)
 {
 	if (xi[0]<-1 || xi[0]>1)
 	{
-		std::cout << "Shape1d::Shape --> Invalid argument 'xi'" << std::endl;
+		std::cout << "Shape1d::Shape --> Invalid coordinate 'xi'" << std::endl;
 		DebugStop();
 	}
 
@@ -36,7 +36,7 @@ void Shape1d::Shape(VecDouble &xi, VecInt &orders, VecDouble &phi, Matrix &dphi)
 		co[1] = 1;
 
 		//Coordenadas paramétricas dos pontos internos
-		for (int i = 2; i < nShapes; i++)
+		for (int i = nCorners; i < nShapes; i++)
 		{
 			co[i] = -1 + (i - 1) * 2 / order;
 		}
@@ -79,14 +79,9 @@ void Shape1d::Shape(VecDouble &xi, VecInt &orders, VecDouble &phi, Matrix &dphi)
 	}
 }
 
-int Shape1d::NShapeFunctions(int side, VecInt &orders)
+int Shape1d::NShapeFunctions(int side, int order)
 {
-	if (orders.size()!=1)
-	{
-		std::cout << "Shape1d::NShapeFunctions --> Invalid dimention for 'orders' vector" << std::endl;
-	}
-
-	if (orders[0]<0)
+	if (order<0)
 	{
 		std::cout << "Shape1d::NShapeFunctions --> Invalid shape function order" << std::endl;
 		DebugStop();
@@ -99,7 +94,7 @@ int Shape1d::NShapeFunctions(int side, VecInt &orders)
 		return 1;
 		break;
 	case 2:
-		return orders[0] - 1;
+		return order - 1;
 		break;
 	default:
 		std::cout << "Shape1d::NShapeFunctions --> Invalid argument 'side' " << side << std::endl;
@@ -110,13 +105,17 @@ int Shape1d::NShapeFunctions(int side, VecInt &orders)
 
 int Shape1d::NShapeFunctions(VecInt &orders)
 {
-	int nCorners = 2;
-	int nSides = 3;
+	if (orders.size() != nSides)
+	{
+		std::cout << "Shape1d::NShapeFunctions --> Invalid dimention for 'orders' vector" << std::endl;
+		DebugStop();
+	}
+
 	int nShapes = nCorners;
 
 	for (int i = nCorners; i < nSides; i++)
 	{
-		nShapes += NShapeFunctions(i, orders);
+		nShapes += NShapeFunctions(i, orders[i - nCorners]);
 	}
 
 	return nShapes;

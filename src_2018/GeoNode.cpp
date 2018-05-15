@@ -9,7 +9,7 @@
 
 void GeoNode::Print(std::ostream &out)
 {
-	out << "POINT COORDINATE = {";
+	out << "COORDINATE = {";
 	for (int i = 0; i < xco.size(); i++)
 	{
 		if (i != 0)

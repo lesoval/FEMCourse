@@ -12,7 +12,7 @@
 #include "GeomTetrahedron.h"
 
 template<class TGeom>
-GeoElementTemplate<TGeom>::GeoElementTemplate(const VecInt &nodeindices, int materialid, GeoMesh *gmesh) :GeoElement(materialid, gmesh)
+GeoElementTemplate<TGeom>::GeoElementTemplate(const VecInt & nodeindices, int materialid, GeoMesh * gmesh, int index):GeoElement(materialid,gmesh,index)
 {
 	Geom.SetNodes(nodeindices);
 }
@@ -20,7 +20,7 @@ GeoElementTemplate<TGeom>::GeoElementTemplate(const VecInt &nodeindices, int mat
 template<class TGeom>
 GeoElementTemplate<TGeom>::GeoElementTemplate(const GeoElementTemplate &copy)
 {
-	this->operator =(copy);
+	this->operator=(copy);
 }
 
 template<class TGeom>
@@ -44,7 +44,7 @@ void GeoElementTemplate<TGeom>::X(const VecDouble &xi, VecDouble &x)
 }
 
 template<class TGeom>
-void GeoElementTemplate<TGeom>::GradX(const VecDouble &xi, Matrix &gradx)
+void GeoElementTemplate<TGeom>::GradX(const VecDouble &xi, VecDouble &x, Matrix &gradx)
 {
     
 }

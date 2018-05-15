@@ -65,7 +65,7 @@ int CompElementTemplate<Shape>::NShapeFunctions(int doflocindex)
 }
 
 template<class Shape>
-int CompElementTemplate<Shape>::ComputeNShapeFunctions(int doflocindex)
+int CompElementTemplate<Shape>::ComputeNShapeFunctions(int doflocindex, int order)
 {
 	return 0;
 }

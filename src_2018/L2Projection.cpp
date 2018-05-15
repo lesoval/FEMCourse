@@ -29,7 +29,7 @@ L2Projection &L2Projection::operator=(const L2Projection &copy)
 
 L2Projection *L2Projection::Clone() const
 {
-	
+	return 0;
 }
 
 L2Projection::~L2Projection() {}
@@ -49,7 +49,7 @@ int L2Projection::NState() const
 	return 0;
 }
 
-void L2Projection::Contribute(IntPointData &integrationpointdata, Matrix &EK, Matrix &EF) const
+void L2Projection::Contribute(IntPointData &integrationpointdata, double weight, Matrix &EK, Matrix &EF) const
 {
 
 }

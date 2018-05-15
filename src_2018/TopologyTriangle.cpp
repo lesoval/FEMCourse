@@ -8,7 +8,7 @@
 #include "TopologyTriangle.h"
 #include "tpanic.h"
 
-static int NSideNodes(int side)
+int TopologyTriangle::NSideNodes(int side)
 {
 	switch (side)
 	{
@@ -32,14 +32,8 @@ static int NSideNodes(int side)
 	}
 }
 
-static int SideNodeIndex(int side, int node)
+int TopologyTriangle::SideNodeIndex(int side, int node)
 {
-	if (node<NSideNodes(side) - 1 || node>NSideNodes(side) - 1)
-	{
-		std::cout << "TopologyTriangle::SideNodeIndex --> Node invalid for 'side' " << side << std::endl;
-		DebugStop();
-	}
-
 	switch (side)
 	{
 	case 0:

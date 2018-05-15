@@ -8,13 +8,13 @@
 #include "ShapeTriangle.h"
 #include "tpanic.h"
 
-void ShapeTriangle::Shape(VecDouble &xi, VecInt &orders, VecDouble &phi, Matrix &dphi)
+void ShapeTriangle::Shape(const VecDouble &xi, VecInt &orders, VecDouble &phi, Matrix &dphi)
 {
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < Dimension; i++)
 	{
 		if (xi[i]<0 || xi[i]>1)
 		{
-			std::cout << "ShapeTriangle::Shape --> Invalid argument 'xi[" << i << "]'" << std::endl;
+			std::cout << "ShapeTriangle::Shape --> Invalid coordinate 'xi[" << i << "]'" << std::endl;
 			DebugStop();
 		}
 	}
@@ -86,20 +86,12 @@ void ShapeTriangle::Shape(VecDouble &xi, VecInt &orders, VecDouble &phi, Matrix 
 	}
 }
 
-int ShapeTriangle::NShapeFunctions(int side, VecInt &orders)
+int ShapeTriangle::NShapeFunctions(int side, int order)
 {
-	if (orders.size() != 4)
+	if (order<0)
 	{
-		std::cout << "ShapeTriangle::NShapeFunctions --> Invalid dimention for 'orders' vector" << std::endl;
-	}
-
-	for (int i = 0; i < 4; i++)
-	{
-		if (orders[i]<0)
-		{
-			std::cout << "ShapeTriangle::NShapeFunctions --> Invalid shape function order on side " << i + 3 << std::endl;
-			DebugStop();
-		}
+		std::cout << "ShapeTriangle::NShapeFunctions --> Invalid shape function order on side " << side << std::endl;
+		DebugStop();
 	}
 
 	switch (side)
@@ -112,17 +104,10 @@ int ShapeTriangle::NShapeFunctions(int side, VecInt &orders)
 	case 3:
 	case 4:
 	case 5:
-		return orders[side - 3] - 1;
+		return order - 1;
 		break;
 	case 6:
-		if (orders[side-3]<0)
-		{
-			return 0;
-		}
-		else
-		{
-			return (orders[side - 3] - 2)*(orders[side - 3] - 1);
-		}
+		return order - 2 < 0 ? 0 : ((order - 2)*(order - 1)) / 2;
 		break;
 	default:
 		std::cout << "ShapeTriangle::NShapeFunctions --> Invalid argument 'side' " << side << std::endl;
@@ -133,13 +118,17 @@ int ShapeTriangle::NShapeFunctions(int side, VecInt &orders)
 
 int ShapeTriangle::NShapeFunctions(VecInt &orders)
 {
-	int nCorners = 3;
-	int nSides = 7;
+	if (orders.size() != nSides)
+	{
+		std::cout << "ShapeTriangle::NShapeFunctions --> Invalid dimention for 'orders' vector" << std::endl;
+		DebugStop();
+	}
+
 	int nShapes = nCorners;
 
 	for (int i = nCorners; i < nSides; i++)
 	{
-		nShapes += NShapeFunctions(i, orders);
+		nShapes += NShapeFunctions(i, orders[i - nCorners]);
 	}
 
 	return nShapes;

@@ -29,7 +29,7 @@ Poisson & Poisson::operator=(const Poisson & copy)
 
 Poisson * Poisson::Clone() const
 {
-	
+	return 0;
 }
 
 Poisson::~Poisson() {}
@@ -49,7 +49,7 @@ int Poisson::NState() const
 	return 0;
 }
 
-void Poisson::Contribute(IntPointData & integrationpointdata, Matrix & EK, Matrix & EF) const
+void Poisson::Contribute(IntPointData &integrationpointdata, double weight, Matrix &EK, Matrix &EF) const
 {
 
 }

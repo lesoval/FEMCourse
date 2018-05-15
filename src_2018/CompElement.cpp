@@ -35,7 +35,7 @@ CompElement::~CompElement() {}
 
 CompElement *CompElement::Clone() const
 {
-	
+	return 0;
 }
 
 MathStatement *CompElement::GetStatement() const
@@ -88,7 +88,7 @@ void CompElement::InitializeIntPointData(IntPointData &data) const
 
 }
 
-void CompElement::ComputeRequiredData(IntPointData &data) const
+void CompElement::ComputeRequiredData(IntPointData &data, VecDouble &intpoint) const
 {
 
 }

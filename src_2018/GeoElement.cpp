@@ -20,8 +20,7 @@ GeoElement::GeoElement(const GeoElement &copy)
 
 void GeoElement::Print(std::ostream &out)
 {
-	out << "ELEMENT: " << Type() << "	MatID: " << MaterialId << "	NODES(" << std::endl;
-
+	out << "ELEMENT: " << Index << "\tTYPE: " << Type() << "\t\tMatID: " << MaterialId << "\tNODES(";
 	for (int i = 0; i < NNodes(); i++)
 	{
 		if (i != 0)

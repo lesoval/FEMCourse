@@ -8,7 +8,7 @@
 #include "TopologyTetrahedron.h"
 #include "tpanic.h"
 
-static int NSideNodes(int side)
+int TopologyTetrahedron::NSideNodes(int side)
 {
 	switch (side)
 	{
@@ -42,14 +42,8 @@ static int NSideNodes(int side)
 	}
 }
 
-static int SideNodeIndex(int side, int node)
+int TopologyTetrahedron::SideNodeIndex(int side, int node)
 {
-	if (node<NSideNodes(side) - 1 || node>NSideNodes(side) - 1)
-	{
-		std::cout << "TopologyTetrahedron::SideNodeIndex --> Node invalid for 'side' " << side << std::endl;
-		DebugStop();
-	}
-
 	int SideNodes[6][2] = { { 0,1 },{ 1,2 },{ 2,0 },{ 0,3 },{ 1,3 },{ 2,3 } };
 	int FaceNodes[4][3] = { { 0,1,2 },{ 0,1,3 },{ 1,2,3 },{ 0,2,3 } };
 

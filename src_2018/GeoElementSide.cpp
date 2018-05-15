@@ -22,7 +22,7 @@ GeoElementSide &GeoElementSide::operator=(const GeoElementSide &copy)
 	return *this;
 }
 
-GeoElementSide GeoElementSide::Neighbour()
+GeoElementSide GeoElementSide::Neighbour() const
 {
-	return fElement ? fElement->Neighbour(fSide) : GeoElementSide();
+	return fElement->Neighbour(fSide);
 };

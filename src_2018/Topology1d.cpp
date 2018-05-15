@@ -8,7 +8,7 @@
 #include "Topology1d.h"
 #include "tpanic.h"
 
-static int NSideNodes(int side)
+int Topology1d::NSideNodes(int side)
 {
 	switch (side)
 	{
@@ -26,13 +26,8 @@ static int NSideNodes(int side)
 	}
 }
 
-static int SideNodeIndex(int side, int node)
+int Topology1d::SideNodeIndex(int side, int node)
 {
-	if (node<NSideNodes(side) - 1 || node>NSideNodes(side) - 1)
-	{
-		std::cout << "Topology1d::SideNodeIndex --> Node invalid for 'side' " << side << std::endl;
-		DebugStop();
-	}
 	switch (side)
 	{
 	case 0:

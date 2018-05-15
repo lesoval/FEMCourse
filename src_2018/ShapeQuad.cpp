@@ -8,13 +8,13 @@
 #include "ShapeQuad.h"
 #include "tpanic.h"
 
-void ShapeQuad::Shape(VecDouble &xi, VecInt &orders, VecDouble &phi, Matrix &dphi)
+void ShapeQuad::Shape(const VecDouble &xi, VecInt &orders, VecDouble &phi, Matrix &dphi)
 {
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < Dimension; i++)
 	{
 		if (xi[i]<-1 || xi[i]>1)
 		{
-			std::cout << "ShapeQuad::Shape --> Invalid argument 'xi[" << i << "]'" << std::endl;
+			std::cout << "ShapeQuad::Shape --> Invalid coordinade 'xi[" << i << "]'" << std::endl;
 			DebugStop();
 		}
 	}
@@ -88,20 +88,12 @@ void ShapeQuad::Shape(VecDouble &xi, VecInt &orders, VecDouble &phi, Matrix &dph
 	}
 }
 
-int ShapeQuad::NShapeFunctions(int side, VecInt &orders)
+int ShapeQuad::NShapeFunctions(int side, int order)
 {
-	if (orders.size() != 5)
+	if (order<0)
 	{
-		std::cout << "ShapeQuad::NShapeFunctions --> Invalid dimention for 'orders' vector" << std::endl;
-	}
-
-	for (int i = 0; i < 5; i++)
-	{
-		if (orders[i]<0)
-		{
-			std::cout << "ShapeQuad::NShapeFunctions --> Invalid shape function order on side " << i + 4 << std::endl;
-			DebugStop();
-		}
+		std::cout << "ShapeQuad::NShapeFunctions --> Invalid shape function order on side " << side << std::endl;
+		DebugStop();
 	}
 
 	switch (side)
@@ -116,10 +108,10 @@ int ShapeQuad::NShapeFunctions(int side, VecInt &orders)
 	case 5:
 	case 6:
 	case 7:
-		return orders[side - 4] - 1;
+		return order - 1;
 		break;
 	case 8:
-		return pow(orders[side - 4] - 1, 2);
+		return pow(order - 1, 2);
 	default:
 		std::cout << "ShapeQuad::NShapeFunctions --> Invalid argument 'side' " << side << std::endl;
 		DebugStop();
@@ -129,13 +121,17 @@ int ShapeQuad::NShapeFunctions(int side, VecInt &orders)
 
 int ShapeQuad::NShapeFunctions(VecInt &orders)
 {
-	int nCorners = 4;
-	int nSides = 9;
+	if (orders.size() != nSides)
+	{
+		std::cout << "ShapeQuad::NShapeFunctions --> Invalid dimention for 'orders' vector" << std::endl;
+		DebugStop();
+	}
+
 	int nShapes = nCorners;
 
 	for (int i = nCorners; i < nSides; i++)
 	{
-		nShapes += NShapeFunctions(i, orders);
+		nShapes += NShapeFunctions(i, orders[i - nCorners]);
 	}
 
 	return nShapes;

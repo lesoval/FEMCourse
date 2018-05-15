@@ -14,7 +14,7 @@ Geom1d::~Geom1d(){}
 
 Geom1d::Geom1d(const Geom1d &copy)
 {
-	this->operator =(copy);
+	this->operator=(copy);
 }
 
 Geom1d &Geom1d::operator=(const Geom1d &copy)

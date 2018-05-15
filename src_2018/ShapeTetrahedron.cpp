@@ -8,9 +8,9 @@
 #include "ShapeTetrahedron.h"
 #include "tpanic.h"
 
-void ShapeTetrahedron::Shape(VecDouble &xi, VecInt &orders, VecDouble &phi, Matrix &dphi)
+void ShapeTetrahedron::Shape(const VecDouble &xi, VecInt &orders, VecDouble &phi, Matrix &dphi)
 {
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < Dimension; i++)
 	{
 		if (xi[i]<0 || xi[i]>1)
 		{
@@ -94,20 +94,12 @@ void ShapeTetrahedron::Shape(VecDouble &xi, VecInt &orders, VecDouble &phi, Matr
 	}
 }
 
-int ShapeTetrahedron::NShapeFunctions(int side, VecInt &orders)
+int ShapeTetrahedron::NShapeFunctions(int side, int order)
 {
-	if (orders.size() != 11)
+	if (order<0)
 	{
-		std::cout << "ShapeTetrahedron::NShapeFunctions --> Invalid dimention for 'orders' vector" << std::endl;
-	}
-
-	for (int i = 0; i < 11; i++)
-	{
-		if (orders[i]<0)
-		{
-			std::cout << "ShapeTetrahedron::NShapeFunctions --> Invalid shape function order on side " << i + 4 << std::endl;
-			DebugStop();
-		}
+		std::cout << "ShapeTetrahedron::NShapeFunctions --> Invalid shape function order on side " << side << std::endl;
+		DebugStop();
 	}
 
 	int totsum, sum;
@@ -125,16 +117,16 @@ int ShapeTetrahedron::NShapeFunctions(int side, VecInt &orders)
 	case 7:
 	case 8:
 	case 9:
-		return orders[side - 4] - 1;
+		return order - 1;
 		break;
 	case 10:
 	case 11:
 	case 12:
 	case 13:
 		sum = 0;
-		if (orders[side - 4] != 0)
+		if (order != 0)
 		{
-			for (int i = 0; i < orders[side - 4] - 1; i++)
+			for (int i = 0; i < order - 1; i++)
 			{
 				sum += i;
 			}
@@ -143,9 +135,9 @@ int ShapeTetrahedron::NShapeFunctions(int side, VecInt &orders)
 		break;
 	case 14:
 		totsum = 0;
-		if (orders[side - 4] != 0)
+		if (order != 0)
 		{
-			for (int i = 1; i < orders[side - 4] - 2; i++)
+			for (int i = 1; i < order - 2; i++)
 			{
 				sum = i * (i + 1) / 2;
 				totsum += sum;
@@ -162,13 +154,17 @@ int ShapeTetrahedron::NShapeFunctions(int side, VecInt &orders)
 
 int ShapeTetrahedron::NShapeFunctions(VecInt &orders)
 {
-	int nCorners = 4;
-	int nSides = 15;
+	if (orders.size() != nSides)
+	{
+		std::cout << "ShapeTetrahedron::NShapeFunctions --> Invalid dimention for 'orders' vector" << std::endl;
+		DebugStop();
+	}
+
 	int nShapes = nCorners;
 
 	for (int i = nCorners; i < nSides; i++)
 	{
-		nShapes += NShapeFunctions(i, orders);
+		nShapes += NShapeFunctions(i, orders[i - nCorners]);
 	}
 
 	return nShapes;
