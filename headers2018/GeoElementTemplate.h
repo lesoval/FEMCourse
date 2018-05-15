@@ -22,7 +22,7 @@ protected:
 public:
     
     // Constructor of GeoElementTemplate
-    GeoElementTemplate(const VecInt &nodeindices, int materialid, GeoMesh *gmesh);
+    GeoElementTemplate(const VecInt &nodeindices, int materialid, GeoMesh *gmesh, int index);
     
     // Copy constructor of GeoElementTemplate
     GeoElementTemplate(const GeoElementTemplate &copy);
@@ -62,10 +62,23 @@ public:
         if(node<0 || node>=Geom.NumNodes()) return -1;
         return Geom.NodeIndex(node);
     }
+
+	// Return the number of nodes associated with a side
+	virtual int NSideNodes(int side)
+	{
+		return Geom.NSideNodes(side);
+	}
+
+	// Return the local node index of a node associated with a side
+	virtual int SideNodeIndex(int side, int node)
+	{
+		return Geom.SideNodeIndex(side, node);
+	}
     
     // Return the neighbour along side
     virtual GeoElementSide Neighbour(int side)
     {
+        //return TPZGeoElSide(fNeighbours[side],this->Mesh());
         return Geom.Neighbour(side);
     }
     
@@ -82,7 +95,7 @@ public:
     virtual void X(const VecDouble &xi, VecDouble &x);
     
     // Compute gradient of x mapping from local parametric coordinates
-    virtual void GradX(const VecDouble &xi, Matrix &gradx);
+    virtual void GradX(const VecDouble &xi, VecDouble &x, Matrix &gradx);
     
     // Function to print results
     virtual void Print(std::ostream &out);

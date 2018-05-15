@@ -10,6 +10,7 @@
 
 #include "DataTypes.h"
 #include "GeoElementSide.h"
+#include "CompElement.h"
 class GeoMesh;
 
 class GeoElement
@@ -22,13 +23,19 @@ protected:
     // Material ID associated with the element
     int MaterialId;
     
+    // Pointer to computational element
+    CompElement *Reference;
+    
+    // Index of the element in the element vector
+    int Index;
+    
 public:
 
     // Default Constructor of GeoElement
     GeoElement();
     
     // Constructor of GeoElement
-    GeoElement(int materialid, GeoMesh *mesh) : GMesh(mesh), MaterialId(materialid)
+    GeoElement(int materialid, GeoMesh *mesh, int index) : GMesh(mesh), MaterialId(materialid), Index(index)
     {
         
     }
@@ -50,6 +57,12 @@ public:
 
     // Return the index of an element nodes
     virtual int NodeIndex(int node) = 0;
+
+	// Return the number of nodes associated with a side
+	virtual int NSideNodes(int side) = 0;
+
+	// Return the local node index of a node associated with a side
+	virtual int SideNodeIndex(int side, int node) = 0;
     
     // Return neighbour element of a given side
     virtual GeoElementSide Neighbour(int side) = 0;
@@ -60,10 +73,25 @@ public:
     // Return the enumerated element type
     virtual ElementType Type() = 0;
 
+    //Set reference
+    virtual void SetReference(CompElement * elp){
+        Reference = elp;
+    }
+    
+    //Get reference
+    virtual CompElement *GetReference() const{
+        return Reference;
+    }
+    
     // Set geometric mesh
     void SetMesh(GeoMesh *gmesh)
     {
         GMesh = gmesh;
+    }
+    
+    // Get geometric mesh
+    GeoMesh* GetMesh(){
+        return GMesh;
     }
     
     // Return material ID
@@ -72,13 +100,25 @@ public:
         return MaterialId;
     }
     
+    // Set the element index
+    void SetIndex(int index)
+    {
+        Index = index;
+    }
+    
+    // Return the element index
+    int GetIndex()
+    {
+        return Index;
+    }
+    
     // Compute x mapping from local parametric coordinates
-    virtual void X(const VecDouble &xi, VecDouble &x) = 0;
+    virtual void X(const VecDouble &xi,  VecDouble &x) = 0;
     
     // Compute gradient of x mapping from local parametric coordinates
-    virtual void GradX(const VecDouble &xi, Matrix &gradx) = 0;
+    virtual void GradX(const VecDouble &xi, VecDouble &x, Matrix &gradx) = 0;
     
     // Function to print results
-    virtual void Print(std::ostream &out);
+    void Print(std::ostream &out);
 };
 #endif /* GeoElement_h */

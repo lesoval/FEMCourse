@@ -50,7 +50,7 @@ public:
     }
 
     // Return neighbour element of a given side
-    GeoElementSide Neighbour();
+    GeoElementSide Neighbour() const;
     
 };
 #endif /* GeoElementSide_h */
