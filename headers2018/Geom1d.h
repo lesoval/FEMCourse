@@ -15,7 +15,6 @@ class Geom1d : public Topology1d
 {
 public:
     
-    
     // Constructor
     Geom1d();
     
@@ -53,7 +52,7 @@ public:
     GeoElementSide Neighbour(int side);
     
     // Initialize the neighbour data structure
-    void SetNeighbour(int side, GeoElementSide &neighbour);
+    void SetNeighbour(int side, const GeoElementSide &neighbour);
     
 protected:
     

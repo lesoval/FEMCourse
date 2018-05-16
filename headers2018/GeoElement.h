@@ -11,6 +11,8 @@
 #include "DataTypes.h"
 #include "GeoElementSide.h"
 #include "CompElement.h"
+#include "GeoMesh.h"
+
 class GeoMesh;
 
 class GeoElement
@@ -35,16 +37,15 @@ public:
     GeoElement();
     
     // Constructor of GeoElement
-    GeoElement(int materialid, GeoMesh *mesh, int index) : GMesh(mesh), MaterialId(materialid), Index(index)
-    {
-        
-    }
+    GeoElement(int materialid, GeoMesh *mesh, int index);
 
     // Copy constructor of GeoElement
     GeoElement(const GeoElement &copy);
 
     // Destructor of GeoElement
     virtual ~GeoElement();
+    
+    virtual GeoElement *Clone(GeoMesh *gmesh) const =0;
     
     // Return number of corner nodes
     virtual int NCornerNodes() = 0;
@@ -57,18 +58,21 @@ public:
 
     // Return the index of an element nodes
     virtual int NodeIndex(int node) = 0;
-
-	// Return the number of nodes associated with a side
-	virtual int NSideNodes(int side) = 0;
-
-	// Return the local node index of a node associated with a side
-	virtual int SideNodeIndex(int side, int node) = 0;
+    
+    // Return number fo sides associated with a side
+    virtual int NSideNodes(int side) = 0;
+    
+    // Local node index of a node associated with a side
+    virtual int SideNodeIndex(int side, int node) = 0;
+    
+    /// Set the node indices of the element
+    virtual void GetNodes(VecInt &nodes) = 0;
     
     // Return neighbour element of a given side
     virtual GeoElementSide Neighbour(int side) = 0;
     
     // Set neighbour element of a given side
-    virtual void SetNeighbour(int side, GeoElementSide &neigh) = 0;
+    virtual void SetNeighbour(int side, const GeoElementSide &neigh) = 0;
     
     // Return the enumerated element type
     virtual ElementType Type() = 0;
@@ -112,6 +116,8 @@ public:
         return Index;
     }
     
+    virtual int WhichSide(VecInt &SideNodeIds) = 0;
+    
     // Compute x mapping from local parametric coordinates
     virtual void X(const VecDouble &xi,  VecDouble &x) = 0;
     
@@ -119,6 +125,6 @@ public:
     virtual void GradX(const VecDouble &xi, VecDouble &x, Matrix &gradx) = 0;
     
     // Function to print results
-    void Print(std::ostream &out);
+    virtual void Print(std::ostream &out);
 };
 #endif /* GeoElement_h */

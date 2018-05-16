@@ -9,6 +9,7 @@
 #define GeoElementTemplate_h
 
 #include "GeoElement.h"
+#include "GeoElementSide.h"
 
 template<class TGeom>
 class GeoElementTemplate : public GeoElement
@@ -31,7 +32,7 @@ public:
     GeoElementTemplate &operator=(const GeoElementTemplate &copy);
     
     // Make a geometric mesh clone from GeoElement
-    GeoElement *Clone(GeoMesh *gmesh)
+    GeoElement *Clone(GeoMesh *gmesh) const
     {
         GeoElement *result = new GeoElementTemplate(*this);
         result->SetMesh(gmesh);
@@ -56,34 +57,38 @@ public:
         return TGeom::nSides;
     }
     
+    // Return number fo sides associated with a side
+    virtual int NSideNodes(int side){
+        return Geom.NSideNodes(side);
+    }
+    
+    // Local node index of a node associated with a side
+    virtual int SideNodeIndex(int side, int node){
+        return Geom.SideNodeIndex(side,node);
+    }
+    
+    /// Return the node indices of the element
+    virtual void GetNodes(VecInt &nodes){
+        return Geom.GetNodes(nodes);
+    };
+
     // Return the index of an element node
     virtual int NodeIndex(int node)
     {
         if(node<0 || node>=Geom.NumNodes()) return -1;
         return Geom.NodeIndex(node);
     }
-
-	// Return the number of nodes associated with a side
-	virtual int NSideNodes(int side)
-	{
-		return Geom.NSideNodes(side);
-	}
-
-	// Return the local node index of a node associated with a side
-	virtual int SideNodeIndex(int side, int node)
-	{
-		return Geom.SideNodeIndex(side, node);
-	}
     
     // Return the neighbour along side
     virtual GeoElementSide Neighbour(int side)
     {
-        //return TPZGeoElSide(fNeighbours[side],this->Mesh());
+        //return GeoElementSide(Geom.Neighbour(side),this->GetMesh());
+        //return GeoElementSide(Geom.Neighbour(side).Element(),side);
         return Geom.Neighbour(side);
     }
     
     // Initialize the neighbour data structure
-    virtual void SetNeighbour(int side, GeoElementSide &neigh)
+    virtual void SetNeighbour(int side, const GeoElementSide &neigh)
     {
         Geom.SetNeighbour(side,neigh);
     }
@@ -96,6 +101,8 @@ public:
     
     // Compute gradient of x mapping from local parametric coordinates
     virtual void GradX(const VecDouble &xi, VecDouble &x, Matrix &gradx);
+    
+    virtual int WhichSide(VecInt &SideNodeIds);
     
     // Function to print results
     virtual void Print(std::ostream &out);

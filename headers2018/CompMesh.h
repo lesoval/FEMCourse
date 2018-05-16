@@ -26,6 +26,9 @@ class CompMesh
     // Vector with math statement objects
     std::vector<MathStatement *> mathstatements;
     
+    // Vector with solution coeficients
+    std::vector<double> solution;
+    
 public:
     
     // Default constructor of CompMesh
@@ -82,7 +85,16 @@ public:
     // Set the vector with math statement objects
     void SetMathVec(const std::vector<MathStatement *> &mathvec);
     
-
+    // Initialize the datastructure FirstEquation of the DOF objects
+    void Resequence();
+    
+    // Initialize the datastructure FirstEquation of the DOF objects in the order specified by the vector
+    void Resequence(VecInt &DOFindices);
+    
+    std::vector<double> &Solution() const;
+    
+    void LoadSolution(std::vector<double> &Sol);
+    
 };
 
 #endif /* CompMesh_h */

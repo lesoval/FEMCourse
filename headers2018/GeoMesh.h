@@ -10,6 +10,7 @@
 
 #include "GeoNode.h"
 #include "GeoElement.h"
+#include "CompMesh.h"
 #include <string>
 
 class GeoMesh
@@ -31,10 +32,7 @@ class GeoMesh
 public:
     
     // Default Constructor of GeoMesh
-    GeoMesh()
-    {
-        
-    }
+    GeoMesh();
     
     // Constructor of GeoMesh
     GeoMesh(const GeoMesh &);
