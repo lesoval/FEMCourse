@@ -11,9 +11,9 @@ template<class Shape>
 CompElementTemplate<Shape>::CompElementTemplate() {}
 
 template<class Shape>
-CompElementTemplate<Shape>::CompElementTemplate(int64_t index, GeoElement * geo) : CompElement(index, geo)
+CompElementTemplate<Shape>::CompElementTemplate(int64_t ind, CompMesh *cmesh, GeoElement * geo) : CompElement(ind, geo)
 {
-	this->GetCompMesh()->SetElement(index, this);
+	this->GetCompMesh()->SetElement(ind, this);
 }
 
 template<class Shape>

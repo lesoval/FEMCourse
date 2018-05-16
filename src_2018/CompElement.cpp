@@ -9,9 +9,9 @@
 
 CompElement::CompElement() {}
 
-CompElement::CompElement(int64_t index, GeoElement *geo)
+CompElement::CompElement(int64_t ind, CompMesh *cmesh, GeoElement *geo)
 {
-	this->index = index;
+	this->index = ind;
 	geoel = geo;
 }
 

@@ -118,7 +118,7 @@ GeoElementSide GeomQuad::Neighbour(int side)
 	return fNeighbours[side];
 }
 
-void GeomQuad::SetNeighbour(int side, GeoElementSide &neighbour)
+void GeomQuad::SetNeighbour(int side, const GeoElementSide &neighbour)
 {
 	fNeighbours[side] = neighbour;
 }

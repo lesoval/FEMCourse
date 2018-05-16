@@ -102,7 +102,7 @@ GeoElementSide Geom1d::Neighbour(int side)
 	return fNeighbours[side];
 }
 
-void Geom1d::SetNeighbour(int side, GeoElementSide &neighbour)
+void Geom1d::SetNeighbour(int side, const GeoElementSide &neighbour)
 {
 	fNeighbours[side] = neighbour;
 }

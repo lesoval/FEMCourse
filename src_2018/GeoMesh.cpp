@@ -8,6 +8,8 @@
 #include "GeoMesh.h"
 #include "tpanic.h"
 
+GeoMesh::GeoMesh() {}
+
 GeoMesh::GeoMesh(const GeoMesh &copy)
 {
 	this->operator=(copy);
@@ -114,7 +116,7 @@ void GeoMesh::BuildConnectivity()
 		for (int j = nCorners; j < nSides; j++)
 		{
 			GeoElementSide gelside(gel, j);//Cria um "GeoElementSide" do elemento "i" com lado "j"
-			std::vector<GeoElementSide> neighbours;//Cria um vetor de vizinhos do lado "j"
+			GeoElementSide neighbour = gelside;//Inicia o vizinho como sendo ele mesmo
 
 			//ComputeNeighbours
 			int nSideNodes = gel->NSideNodes(j);//Número de nós ligados ao lado "j"
@@ -149,34 +151,24 @@ void GeoMesh::BuildConnectivity()
 					{
 						if (AllNeigh[k].Element()->GetIndex() == AllNeigh[l].Element()->GetIndex())
 						{
+							GeoElement *el = AllNeigh[k].Element();
 							int side;
 
 							int side1 = AllNeigh[k].Side();
-							int side2 = AllNeigh[l].Side();		
+							int side2 = AllNeigh[l].Side();
 
-							if (side1 > side2)
+							for (int p = el->NCornerNodes(); p < el->NSides(); p++)
 							{
-								side = side2 + AllNeigh[l].Element()->NCornerNodes();
+								if ((side1 == el->SideNodeIndex(p, 0) && side2 == el->SideNodeIndex(p, 1)) ||
+									(side2 == el->SideNodeIndex(p, 0) && side1 == el->SideNodeIndex(p, 1)))
+								{
+									side = p;
+								}
 							}
 
-							if (side1 < side2)
-							{
-								side = side1 + AllNeigh[k].Element()->NCornerNodes();
-							}
+							GeoElementSide neigh(el, side);
 
-							if ((side1 > 1 && side2 == 0))
-							{
-								side = side1 + AllNeigh[k].Element()->NCornerNodes();
-							}
-
-							if ((side1 == 0 && side2 > 1))
-							{
-								side = side2 + AllNeigh[l].Element()->NCornerNodes();
-							}
-
-							GeoElementSide neigh(AllNeigh[k].Element(), side);
-
-							neighbours.push_back(neigh);
+							neighbour = neigh;
 						}
 					}
 				}
@@ -194,9 +186,26 @@ void GeoMesh::BuildConnectivity()
 							if (AllNeigh[k].Element()->GetIndex() == AllNeigh[l].Element()->GetIndex()
 								&& AllNeigh[l].Element()->GetIndex() == AllNeigh[m].Element()->GetIndex())
 							{
-								neighbours.push_back(AllNeigh[k]);
-								neighbours.push_back(AllNeigh[l]);
-								neighbours.push_back(AllNeigh[m]);
+								GeoElement *el = AllNeigh[k].Element();
+								int side;
+
+								int side1 = AllNeigh[k].Side();
+								int side2 = AllNeigh[l].Side();
+								int side3 = AllNeigh[m].Side();
+
+								for (int p = el->NCornerNodes(); p < el->NSides(); p++)
+								{
+									if ((side1 == el->SideNodeIndex(p, 0) && side2 == el->SideNodeIndex(p, 1) && side3 == el->SideNodeIndex(p, 2)) ||
+										(side2 == el->SideNodeIndex(p, 0) && side3 == el->SideNodeIndex(p, 1) && side1 == el->SideNodeIndex(p, 2)) ||
+										(side3 == el->SideNodeIndex(p, 0) && side1 == el->SideNodeIndex(p, 1) && side2 == el->SideNodeIndex(p, 2)))
+									{
+										side = p;
+									}
+								}
+
+								GeoElementSide neigh(el, side);
+
+								neighbour = neigh;
 							}
 						}
 					}
@@ -218,10 +227,28 @@ void GeoMesh::BuildConnectivity()
 									&& AllNeigh[l].Element()->GetIndex() == AllNeigh[m].Element()->GetIndex()
 									&& AllNeigh[m].Element()->GetIndex() == AllNeigh[n].Element()->GetIndex())
 								{
-									neighbours.push_back(AllNeigh[k]);
-									neighbours.push_back(AllNeigh[l]);
-									neighbours.push_back(AllNeigh[m]);
-									neighbours.push_back(AllNeigh[n]);
+									GeoElement *el = AllNeigh[k].Element();
+									int side;
+
+									int side1 = AllNeigh[k].Side();
+									int side2 = AllNeigh[l].Side();
+									int side3 = AllNeigh[m].Side();
+									int side4 = AllNeigh[n].Side();
+
+									for (int p = el->NCornerNodes(); p < el->NSides(); p++)
+									{
+										if ((side1 == el->SideNodeIndex(p, 0) && side2 == el->SideNodeIndex(p, 1) && side3 == el->SideNodeIndex(p, 2) && side4 == el->SideNodeIndex(p, 3)) ||
+											(side2 == el->SideNodeIndex(p, 0) && side3 == el->SideNodeIndex(p, 1) && side4 == el->SideNodeIndex(p, 2) && side1 == el->SideNodeIndex(p, 3)) ||
+											(side3 == el->SideNodeIndex(p, 0) && side4 == el->SideNodeIndex(p, 1) && side1 == el->SideNodeIndex(p, 2) && side2 == el->SideNodeIndex(p, 3)) ||
+											(side4 == el->SideNodeIndex(p, 0) && side1 == el->SideNodeIndex(p, 1) && side2 == el->SideNodeIndex(p, 2) && side3 == el->SideNodeIndex(p, 3)))
+										{
+											side = p;
+										}
+									}
+
+									GeoElementSide neigh(el, side);
+
+									neighbour = neigh;
 								}
 							}
 						}
@@ -238,25 +265,8 @@ void GeoMesh::BuildConnectivity()
 				break;
 			}
 
-			int nNeigh = neighbours.size();//Número de elementos vizinhos do lado "j"
+			gel->SetNeighbour(j, neighbour);
 
-			if (neighbours.size() == 0)//Se não existir vizinho o lado "j" do elemento "i" será o próprio vizinho
-			{
-				gel->SetNeighbour(j, gelside);
-			}
-
-			else
-			{
-				for (int k = 0; k < nNeigh; k++)
-				{
-					if (neighbours[k].Side() == -1)
-					{
-						std::cout << "GeoMesh::BuildConnectivity : Inconsistent mesh detected" << std::endl;
-						continue;
-					}
-					gel->SetNeighbour(j, neighbours[k]);
-				}
-			}
 		}
 	}
 }

@@ -120,7 +120,7 @@ GeoElementSide GeomTetrahedron::Neighbour(int side)
 	return fNeighbours[side];
 }
 
-void GeomTetrahedron::SetNeighbour(int side, GeoElementSide &neighbour)
+void GeomTetrahedron::SetNeighbour(int side, const GeoElementSide &neighbour)
 {
 	fNeighbours[side] = neighbour;
 }

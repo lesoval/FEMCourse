@@ -54,7 +54,7 @@ void Poisson::Contribute(IntPointData &integrationpointdata, double weight, Matr
 
 }
 
-void Poisson::PostProcess(IntPointData & integrationpointdata, const std::string & variable, VecDouble & postprocvalue) const
+std::vector<double> Poisson::PostProcess(const IntPointData & integrationpointdata, const PostProcVar var) const
 {
-
+	return std::vector<double>();
 }

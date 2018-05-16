@@ -116,7 +116,7 @@ GeoElementSide GeomTriangle::Neighbour(int side)
 	return fNeighbours[side];
 }
 
-void GeomTriangle::SetNeighbour(int side, GeoElementSide &neighbour)
+void GeomTriangle::SetNeighbour(int side, const GeoElementSide &neighbour)
 {
 	fNeighbours[side] = neighbour;
 }
