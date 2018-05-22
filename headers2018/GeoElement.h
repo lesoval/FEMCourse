@@ -11,6 +11,11 @@
 #include "DataTypes.h"
 #include "GeoElementSide.h"
 #include "CompElement.h"
+#include "CompElementTemplate.h"
+#include "Shape1d.h"
+#include "ShapeQuad.h"
+#include "ShapeTriangle.h"
+#include "ShapeTetrahedron.h"
 #include "GeoMesh.h"
 
 class GeoMesh;
@@ -104,6 +109,9 @@ public:
         return MaterialId;
     }
     
+    // Create a computational element
+    CompElement *CreateCompEl(CompMesh *mesh, int64_t index);
+    
     // Set the element index
     void SetIndex(int index)
     {
@@ -124,7 +132,12 @@ public:
     // Compute gradient of x mapping from local parametric coordinates
     virtual void GradX(const VecDouble &xi, VecDouble &x, Matrix &gradx) = 0;
     
+    // Compute a QR facotrization of the gradient of the mapping function, Q = Jacobian and R = axes
+    virtual void Jacobian(const Matrix &gradx, Matrix &jac,Matrix &axes, double &detjac, Matrix &jacinv) = 0;
+    
     // Function to print results
     virtual void Print(std::ostream &out);
+    
+
 };
 #endif /* GeoElement_h */
