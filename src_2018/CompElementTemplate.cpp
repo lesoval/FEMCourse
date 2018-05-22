@@ -6,14 +6,14 @@
 */
 
 #include "CompElementTemplate.h"
+#include "CompMesh.h"
 
 template<class Shape>
 CompElementTemplate<Shape>::CompElementTemplate() {}
 
 template<class Shape>
-CompElementTemplate<Shape>::CompElementTemplate(int64_t ind, CompMesh *cmesh, GeoElement * geo) : CompElement(ind, geo)
+CompElementTemplate<Shape>::CompElementTemplate(int64_t ind, CompMesh *cmesh, GeoElement * geo) : CompElement(ind, cmesh, geo)
 {
-	this->GetCompMesh()->SetElement(ind, this);
 }
 
 template<class Shape>
@@ -42,31 +42,56 @@ CompElement * CompElementTemplate<Shape>::Clone() const
 }
 
 template<class Shape>
-void CompElementTemplate<Shape>::ShapeFunctions(const VecDouble & intpoint, VecDouble & phi, Matrix & dphi)
+void CompElementTemplate<Shape>::ShapeFunctions(const VecDouble & intpoint, VecDouble & phi, Matrix & dphi) const
 {
+	VecInt orders(NDOF());
+	Shape::Shape(intpoint, orders, phi, dphi);
+	CompMesh *cmesh = this->GetCompMesh();
 }
 
 template<class Shape>
-int CompElementTemplate<Shape>::NShapeFunctions()
+int CompElementTemplate<Shape>::NShapeFunctions() const
 {
 	return 0;
 }
 
 template<class Shape>
-int CompElementTemplate<Shape>::NDOF()
+void CompElementTemplate<Shape>::SetNDOF(int64_t ndof)
 {
-	return 0;
+	dofindexes.resize(ndof);
 }
 
 template<class Shape>
-int CompElementTemplate<Shape>::NShapeFunctions(int doflocindex)
+void CompElementTemplate<Shape>::SetDOFIndex(int i, int64_t dofindex)
 {
-	return 0;
+	dofindexes[i] = dofindex;
+}
+
+template<class Shape>
+int CompElementTemplate<Shape>::NDOF() const
+{
+	return dofindexes.size();
+}
+
+template<class Shape>
+int CompElementTemplate<Shape>::NShapeFunctions(int doflocindex) const
+{
+	CompMesh cmesh = GetCompMesh();
+	DOF dof = cmesh.GetDOF(doflocindex);
+	
+	return dof.GetNShape();
 }
 
 template<class Shape>
 int CompElementTemplate<Shape>::ComputeNShapeFunctions(int doflocindex, int order)
 {
-	return 0;
+	dofindexes.resize(doflocindex + 1);
+	dofindexes[doflocindex] = doflocindex;
+
+	return Shape::NShapeFunctions(doflocindex, order);
 }
 
+template class CompElementTemplate<Shape1d>;
+template class CompElementTemplate<ShapeQuad>;
+template class CompElementTemplate<ShapeTriangle>;
+template class CompElementTemplate<ShapeTetrahedron>;

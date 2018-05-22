@@ -6,8 +6,15 @@
 */
 
 #include "CompMesh.h"
+#include "GeoElement.h"
+#include "MathStatement.h"
 
 CompMesh::CompMesh() {}
+
+CompMesh::CompMesh(GeoMesh * gmesh)
+{
+	SetGeoMesh(gmesh);
+}
 
 CompMesh::CompMesh(const CompMesh &copy)
 {
@@ -17,6 +24,16 @@ CompMesh::CompMesh(const CompMesh &copy)
 }
 
 CompMesh::~CompMesh() {}
+
+GeoMesh * CompMesh::GetGeoMesh() const
+{
+	return geomesh;
+}
+
+void CompMesh::SetGeoMesh(GeoMesh * gmesh)
+{
+	geomesh = gmesh;
+}
 
 void CompMesh::SetNumberElement(int64_t nelem)
 {
@@ -91,4 +108,42 @@ void CompMesh::SetDOFVec(const std::vector<DOF> &dofvec)
 void CompMesh::SetMathVec(const std::vector<MathStatement *> &mathvec)
 {
 	mathstatements = mathvec;
+}
+
+void CompMesh::AutoBuild()//Incompleto
+{
+	int nElements = geomesh->NumElements();
+	SetNumberElement(nElements);
+
+	for (int i = 0; i < nElements; i++)
+	{
+		GeoElement *gel = geomesh->Element(i);
+		CompElement *CompEl = gel->CreateCompEl(this, i);
+
+		SetElement(i, CompEl);
+		MathStatement *material = GetMath(i);
+		CompEl->SetStatement(material);
+
+		int nSides = gel->NSides();
+		int nState = material->NState();
+		VecInt orders(nSides, DefaultOrder);
+	}
+}
+
+void CompMesh::Resequence()
+{
+}
+
+void CompMesh::Resequence(VecInt & DOFindices)
+{
+}
+
+std::vector<double>& CompMesh::Solution()
+{
+	return solution;
+}
+
+void CompMesh::LoadSolution(std::vector<double>& Sol)
+{
+	solution = Sol;
 }

@@ -11,8 +11,9 @@ CompElement::CompElement() {}
 
 CompElement::CompElement(int64_t ind, CompMesh *cmesh, GeoElement *geo)
 {
-	this->index = ind;
+	index = ind;
 	geoel = geo;
+	compmesh = cmesh;
 }
 
 CompElement::CompElement(const CompElement &copy)
@@ -85,12 +86,36 @@ void CompElement::SetCompMesh(CompMesh *mesh)
 
 void CompElement::InitializeIntPointData(IntPointData &data) const
 {
+	int dim = Dimension();
+	int nShape = NShapeFunctions();
+	int nState = 1;
+	
+	data.weight = 0;
+	data.detjac = 0;
+
+	data.axes(dim, 3);
+	data.x.resize(dim);
+	data.ksi.resize(dim);
+
+	data.phi.resize(nShape);
+	data.dphidksi.Resize(dim, nShape);
+
+	data.gradx.Resize(dim, nShape);
+	data.dphidx.Resize(dim, nShape);
+
+	data.solution.resize(nState);
+	data.dsoldksi.Resize(dim, nState);
+	data.dsoldx.Resize(dim, nState);
 
 }
 
 void CompElement::ComputeRequiredData(IntPointData &data, VecDouble &intpoint) const
 {
+	
+}
 
+void CompElement::Convert2Axes(const Matrix & dphi, const Matrix & jacinv, Matrix & dphidx) const
+{
 }
 
 void CompElement::CalcStiff(Matrix &ek, Matrix &ef) const
