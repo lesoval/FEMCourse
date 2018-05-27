@@ -110,23 +110,23 @@ void CompMesh::SetMathVec(const std::vector<MathStatement *> &mathvec)
 	mathstatements = mathvec;
 }
 
-void CompMesh::AutoBuild()//Incompleto
+void CompMesh::AutoBuild()
 {
+	int nNodes = geomesh->NumNodes();
 	int nElements = geomesh->NumElements();
+
 	SetNumberElement(nElements);
+	SetNumberMath(nElements);
+	SetNumberDOF(nNodes);
 
 	for (int i = 0; i < nElements; i++)
 	{
 		GeoElement *gel = geomesh->Element(i);
 		CompElement *CompEl = gel->CreateCompEl(this, i);
+		SetElement(i, CompEl);	
 
-		SetElement(i, CompEl);
-		MathStatement *material = GetMath(i);
-		CompEl->SetStatement(material);
-
-		int nSides = gel->NSides();
-		int nState = material->NState();
-		VecInt orders(nSides, DefaultOrder);
+		MathStatement *mat = GetMath(i);
+		CompEl->SetStatement(mat);
 	}
 }
 

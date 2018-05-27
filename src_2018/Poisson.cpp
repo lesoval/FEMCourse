@@ -52,38 +52,49 @@ int Poisson::NState() const
 void Poisson::Contribute(IntPointData &integrationpointdata, double weight, Matrix &EK, Matrix &EF) const
 {
 	VecDouble &phi = integrationpointdata.phi;
-	Matrix &dphi = integrationpointdata.dphidx;
-	VecDouble &x = integrationpointdata.x;
-	Matrix &axes = integrationpointdata.axes;
+	Matrix &dphix = integrationpointdata.dphidx;
+	VecDouble  &x = integrationpointdata.x;
+	Matrix  &axes = integrationpointdata.axes;
+	double detjac = integrationpointdata.detjac;
 
-	int nphi = phi.size();
-	//     VecDouble f(1,0.); incluir set force function no main
-	//     forceFunction(x,f);
-	Matrix perm = GetPermeability();
-	Matrix Kdphi(2, 2, 0.);
+	int dim = integrationpointdata.x.size();
+	int nShapes = integrationpointdata.phi.size();
 
-	for (int ik = 0; ik<2; ik++)
+	VecDouble force(dim);
+	forceFunction(x, force);
+
+	for (int i = 0; i < nShapes; i++)
 	{
-		for (int jk = 0; jk<2; jk++)
+		for (int j = 0; j < dim; j++)
 		{
-			for (int kd = 0; kd<2; kd++)
+			EF(i, j) += detjac * weight * phi[i] * force[j];
+		}
+	}
+
+	Matrix perm = permeability;
+	Matrix gradphi(dim, nShapes);
+
+	for (int i = 0; i < nShapes; i++)
+	{
+		for (int j = 0; j < dim; j++)
+		{
+			for (int k = 0; k < dim; k++)
 			{
-				Kdphi(ik, jk) += perm(ik, kd)*dphi(kd, jk);
+				gradphi(k, i) += dphix(j, i)*axes(j, k);
 			}
 		}
 	}
 
-	for (int in = 0; in<2; in++)
+	for (int i = 0; i < nShapes; i++)
 	{
-		EF(in, 0) += -weight * phi[in] * 0;
-		for (int jn = 0; jn<nphi; jn++)
+		for (int j = 0; j < nShapes; j++)
 		{
-			for (int kd = 0; kd<2; kd++)
+			for (int k = 0; k < dim; k++)
 			{
-				EK(in, jn) += weight * (Kdphi(kd, in)*dphi(kd, jn));
+				EK(i, j) += detjac * weight*(gradphi(k, i)*gradphi(k, j));
 			}
 		}
-	}
+	}	
 }
 
 std::vector<double> Poisson::PostProcess(const IntPointData & integrationpointdata, const PostProcVar var) const

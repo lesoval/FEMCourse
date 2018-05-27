@@ -29,30 +29,19 @@ GeomTetrahedron &GeomTetrahedron::operator=(const GeomTetrahedron &copy)
 	return *this;
 }
 
-void GeomTetrahedron::Shape(const VecDouble &xi, VecDouble &phi, TMatrix &dphi)
+void GeomTetrahedron::Shape(const VecDouble &xi, VecDouble &phi, Matrix &dphi)
 {
-	double ksi = xi[0];
-	double eta = xi[1];
-	double zeta = xi[2];
-
-	phi[0] = 1 - ksi - eta - zeta;
-	phi[1] = ksi;
-	phi[2] = eta;
-	phi[3] = zeta;
-
-	dphi(0, 0) = -1;	dphi(1, 0) = -1;	dphi(2, 0) = -1;
-	dphi(0, 1) = 1;		dphi(1, 1) = 0;		dphi(2, 1) = 0;
-	dphi(0, 2) = 0;		dphi(1, 2) = 1;		dphi(2, 2) = 0;
-	dphi(0, 3) = 0;		dphi(1, 3) = 0;		dphi(2, 3) = 1;
+	VecInt orders(nSides, 1);
+	ShapeTetrahedron::Shape(xi, orders, phi, dphi);
 }
 
-void GeomTetrahedron::X(const VecDouble &xi, TMatrix &NodeCo, VecDouble &x)
+void GeomTetrahedron::X(const VecDouble &xi, Matrix &NodeCo, VecDouble &x)
 {
 	int nRows = NodeCo.Rows();
 	int nCols = NodeCo.Cols();
 
 	VecDouble phi(4);
-	TMatrix dphi(3, 4);
+	Matrix dphi(3, 4);
 	Shape(xi, phi, dphi);
 
 	for (int i = 0; i < nRows; i++)

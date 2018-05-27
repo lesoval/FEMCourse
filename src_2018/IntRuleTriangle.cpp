@@ -601,6 +601,17 @@ IntRuleTriangle::IntRuleTriangle() :IntRule() {}
 IntRuleTriangle::IntRuleTriangle(int order)
 {
 	SetOrder(order);
+}
+
+void IntRuleTriangle::SetOrder(int order)
+{
+	if (order < 0 || order > 21)
+	{
+		std::cout << "IntRuleTriangle::SetOrder --> Invalid argument 'order'" << std::endl;
+		DebugStop();
+	}
+
+	fOrder = order;
 
 	// Define o número de pontos necessários para integração
 	int NRGAUPO[22] = { 1, 1, 3, 6, 6, 7, 12, 15, 16, 19, 25, 28, 33, 37, 46, 52, 55, 61, 72, 73, 88, 91 };
@@ -804,15 +815,4 @@ IntRuleTriangle::IntRuleTriangle(int order)
 	default:
 		DebugStop();
 	}
-}
-
-void IntRuleTriangle::SetOrder(int order)
-{
-	if (order < 0 || order > 21)
-	{
-		std::cout << "IntRuleTriangle::SetOrder --> Invalid argument 'order'" << std::endl;
-		DebugStop();
-	}
-
-	fOrder = order;
 }

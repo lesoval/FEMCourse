@@ -13,6 +13,17 @@ IntRule1d::IntRule1d():IntRule(){}
 IntRule1d::IntRule1d(int order)
 {
 	SetOrder(order);
+}
+
+void IntRule1d::SetOrder(int order)
+{
+	if (order<0)
+	{
+		std::cout << "IntRule1d::SetOrder --> Invalid argument 'order'" << std::endl;
+		DebugStop();
+	}
+
+	fOrder = order;
 
 	// Define o número de pontos necessários para integração
 	int npoints, resto;
@@ -39,17 +50,6 @@ IntRule1d::IntRule1d(int order)
 	{
 		fPoints.PutVal(i, 0, points[i]);
 	}
-}
-
-void IntRule1d::SetOrder(int order)
-{
-	if (order<0)
-	{
-		std::cout << "IntRule1d::SetOrder --> Invalid argument 'order'" << std::endl;
-		DebugStop();
-	}
-
-	fOrder = order;
 }
 
 void IntRule1d::gauleg(const double x1, const double x2, VecDouble &x, VecDouble &w)

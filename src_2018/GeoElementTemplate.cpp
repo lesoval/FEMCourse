@@ -41,19 +41,108 @@ ElementType GeoElementTemplate<TGeom>::Type()
 template<class TGeom>
 void GeoElementTemplate<TGeom>::X(const VecDouble &xi, VecDouble &x)
 {
-    
+	int nNodes = NNodes();
+	int dim = x.size();
+	Matrix NodeCo(dim, nNodes);
+
+	for (int i = 0; i < nNodes; i++)
+	{
+		for (int j = 0; j < dim; j++)
+		{
+			int NodeId = NodeIndex(i);
+			NodeCo(j, i) = GMesh->Node(NodeId).Coord(j);
+		}
+	}
+
+	Geom.X(xi, NodeCo, x);
 }
 
 template<class TGeom>
 void GeoElementTemplate<TGeom>::GradX(const VecDouble &xi, VecDouble &x, Matrix &gradx)
 {
-    
+	int nNodes = NNodes();
+	int dim = x.size();
+	Matrix NodeCo(dim, nNodes);
+
+	for (int i = 0; i < nNodes; i++)
+	{
+		for (int j = 0; j < dim; j++)
+		{
+			int NodeId = NodeIndex(i);
+			NodeCo(j, i) = GMesh->Node(NodeId).Coord(j);
+		}
+	}
+
+	Geom.GradX(xi, NodeCo, x, gradx);
 }
 
 template<class TGeom>
 void GeoElementTemplate<TGeom>::Jacobian(const Matrix &gradx, Matrix &jac, Matrix &axes, double &detjac, Matrix &jacinv)
 {
+	int dim = gradx.Rows();
+	int nShapes = gradx.Cols();
 
+	jac.Resize(dim, dim);
+	jacinv.Resize(dim, dim);
+	axes.Zero();
+
+	for (int i = 0; i < dim; i++)
+	{
+		for (int j = 0; j < dim; j++)
+		{
+			jac(i, j) = gradx.GetVal(j, i);
+		}
+	}
+
+	switch (dim)
+	{
+	case 1:
+		detjac = jac(0, 0);
+		jacinv(0, 0) = 1 / detjac;
+		axes(0, 0) = 1;
+
+		break;
+
+	case 2:
+		detjac = jac(0, 0)*jac(1, 1) - jac(0, 1)*jac(1, 0);
+
+		jacinv(0, 0) = jac(1, 1) / detjac;
+		jacinv(1, 1) = jac(0, 0) / detjac;
+		jacinv(0, 1) = -jac(0, 1) / detjac;
+		jacinv(1, 0) = -jac(1, 0) / detjac;
+		
+		axes(0, 0) = 1;
+		axes(1, 1) = 1;
+
+		break;
+
+	case 3:
+		double pos, neg;
+		pos = jac(0, 0)*jac(1, 1)*jac(2, 2) + jac(0, 1)*jac(1, 2)*jac(2, 0) + jac(0, 2)*jac(1, 0)*jac(2, 1);
+		neg = jac(0, 2)*jac(1, 1)*jac(2, 0) + jac(0, 1)*jac(1, 0)*jac(2, 2) + jac(0, 0)*jac(1, 2)*jac(2, 1);
+		detjac = pos - neg;
+
+		jacinv(0, 0) = (-jac(1, 2)*jac(2, 1) + jac(1, 1)*jac(2, 2)) / detjac;
+		jacinv(0, 1) = (jac(0, 2)*jac(2, 1) - jac(0, 1)*jac(2, 2)) / detjac;
+		jacinv(0, 2) = (-jac(0, 2)*jac(1, 1) + jac(0, 1)*jac(1, 2)) / detjac;
+		jacinv(1, 0) = (jac(1, 2)*jac(2, 0) - jac(1, 0)*jac(2, 2)) / detjac;
+		jacinv(1, 1) = (-jac(0, 2)*jac(2, 0) + jac(0, 0)*jac(2, 2)) / detjac;
+		jacinv(1, 2) = (jac(0, 2)*jac(1, 0) - jac(0, 0)*jac(1, 2)) / detjac;
+		jacinv(2, 0) = (-jac(1, 1)*jac(2, 0) + jac(1, 0)*jac(2, 1)) / detjac;
+		jacinv(2, 1) = (jac(0, 1)*jac(2, 0) - jac(0, 0)*jac(2, 1)) / detjac;
+		jacinv(2, 2) = (-jac(0, 1)*jac(1, 0) + jac(0, 0)*jac(1, 1)) / detjac;
+
+		axes(0, 0) = 1.0;
+		axes(1, 1) = 1.0;
+		axes(2, 2) = 1.0;
+
+		break;
+
+	default:
+		std::cout << "GeoElement::Jacobian --> Inconsistent matrix dimension." << std::endl;
+		DebugStop();
+		break;
+	}
 }
 
 template<class TGeom>

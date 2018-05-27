@@ -22,7 +22,7 @@ L2Projection::L2Projection(const L2Projection &copy)
 L2Projection &L2Projection::operator=(const L2Projection &copy)
 {
 	projection = copy.projection;
-	//forceFunction = copy.foceFunction;
+	forceFunction = copy.forceFunction;
 	
 	return *this;
 }
@@ -46,7 +46,7 @@ void L2Projection::SetProjectionMatrix(const Matrix &proj)
 
 int L2Projection::NState() const
 {
-	return 0;
+	return 1;
 }
 
 void L2Projection::Contribute(IntPointData &integrationpointdata, double weight, Matrix &EK, Matrix &EF) const

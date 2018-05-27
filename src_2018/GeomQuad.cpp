@@ -29,29 +29,19 @@ GeomQuad &GeomQuad::operator=(const GeomQuad &copy)
 	return *this;
 }
 
-void GeomQuad::Shape(const VecDouble &xi, VecDouble &phi, TMatrix &dphi)
+void GeomQuad::Shape(const VecDouble & xi, VecDouble & phi, Matrix & dphi)
 {
-	double ksi = xi[0];
-	double eta = xi[1];
-
-	phi[0] = (1 - ksi)*(1 - eta) / 4;
-	phi[1] = (1 + ksi)*(1 - eta) / 4;
-	phi[2] = (1 + ksi)*(1 + eta) / 4;
-	phi[3] = (1 - ksi)*(1 + eta) / 4;
-
-	dphi(0, 0) = (eta - 1) / 4;		dphi(1, 0) = (ksi - 1) / 4;
-	dphi(0, 1) = (1 - eta) / 4;		dphi(1, 1) = (1 - ksi) / 4;
-	dphi(0, 2) = (eta + 1) / 4;		dphi(1, 2) = (ksi + 1) / 4;
-	dphi(0, 3) = (1 - eta) / 4;		dphi(1, 3) = (1 - ksi) / 4;
+	VecInt orders(nSides, 1);
+	ShapeQuad::Shape(xi, orders, phi, dphi);
 }
 
-void GeomQuad::X(const VecDouble &xi, TMatrix &NodeCo, VecDouble &x)
+void GeomQuad::X(const VecDouble &xi, Matrix &NodeCo, VecDouble &x)
 {
 	int nRows = NodeCo.Rows();
 	int nCols = NodeCo.Cols();
 
 	VecDouble phi(4);
-	TMatrix dphi(2, 4);
+	Matrix dphi(2, 4);
 	Shape(xi, phi, dphi);
 
 	for (int i = 0; i < nRows; i++)

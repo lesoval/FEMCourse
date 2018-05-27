@@ -13,6 +13,17 @@ IntRuleQuad::IntRuleQuad() :IntRule() {}
 IntRuleQuad::IntRuleQuad(int order)
 {
 	SetOrder(order);
+}
+
+void IntRuleQuad::SetOrder(int order)
+{
+	if (order<0)
+	{
+		std::cout << "IntRuleQuad::SetOrder --> Invalid argument 'order'" << std::endl;
+		DebugStop();
+	}
+
+	fOrder = order;
 
 	// Calcula o número de pontos necessários para integração
 	int npoints, resto;
@@ -46,17 +57,6 @@ IntRuleQuad::IntRuleQuad(int order)
 			fPoints.PutVal(j + i * n, 1, points[i]);
 		}
 	}
-}
-
-void IntRuleQuad::SetOrder(int order)
-{
-	if (order<0)
-	{
-		std::cout << "IntRuleQuad::SetOrder --> Invalid argument 'order'" << std::endl;
-		DebugStop();
-	}
-
-	fOrder = order;
 }
 
 void IntRuleQuad::gaulegQuad(const double x1, const double x2, VecDouble &x, VecDouble &w)

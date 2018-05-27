@@ -6,6 +6,8 @@
 */
 
 #include "CompElement.h"
+#include "GeoElement.h"
+#include "MathStatement.h"
 
 CompElement::CompElement() {}
 
@@ -87,38 +89,78 @@ void CompElement::SetCompMesh(CompMesh *mesh)
 void CompElement::InitializeIntPointData(IntPointData &data) const
 {
 	int dim = Dimension();
-	int nShape = NShapeFunctions();
-	int nState = 1;
+	int nShapes = NShapeFunctions();
+//	int nState = GetStatement()->NState();
 	
 	data.weight = 0;
 	data.detjac = 0;
 
-	data.axes(dim, 3);
+	data.axes.Resize(dim, dim);
 	data.x.resize(dim);
 	data.ksi.resize(dim);
 
-	data.phi.resize(nShape);
-	data.dphidksi.Resize(dim, nShape);
+	data.phi.resize(nShapes);
+	data.dphidksi.Resize(dim, nShapes);
 
-	data.gradx.Resize(dim, nShape);
-	data.dphidx.Resize(dim, nShape);
+	data.gradx.Resize(dim, nShapes);
+	data.dphidx.Resize(dim, nShapes);
 
-	data.solution.resize(nState);
-	data.dsoldksi.Resize(dim, nState);
-	data.dsoldx.Resize(dim, nState);
+	//data.solution.resize(nState);
+	//data.dsoldksi.Resize(dim, nState);
+	//data.dsoldx.Resize(dim, nState);
 
 }
 
 void CompElement::ComputeRequiredData(IntPointData &data, VecDouble &intpoint) const
 {
-	
+	Matrix gradx, jac, jacinv;
+
+	geoel->X(intpoint, data.x);
+	geoel->GradX(intpoint, data.x, gradx);
+	geoel->Jacobian(gradx, jac, data.axes, data.detjac, jacinv);
+
+	ShapeFunctions(intpoint, data.phi, data.dphidksi);
+	Convert2Axes(data.dphidksi, jacinv, data.dphidx);
 }
 
 void CompElement::Convert2Axes(const Matrix & dphi, const Matrix & jacinv, Matrix & dphidx) const
 {
+	int nShapes = NShapeFunctions();
+	int dim = Dimension();
+
+	for (int i = 0; i < dim; i++)
+	{
+		for (int j = 0; j < nShapes; j++)
+		{
+			for (int k = 0; k < dim; k++)
+			{
+				dphidx(i, j) += dphi.GetVal(i, j)*jacinv.GetVal(k, i);
+			}
+		}
+	}
 }
 
 void CompElement::CalcStiff(Matrix &ek, Matrix &ef) const
 {
+	IntPointData data;
+	InitializeIntPointData(data);
+	
+	int dim = Dimension();
+	int nShapes = NShapeFunctions();
+	int nIntpoints = intrule->NPoints();
 
+	ek.Resize(nShapes, nShapes);
+	ef.Resize(nShapes, dim);
+
+	for (int i = 0; i < nIntpoints; i++)
+	{
+		intrule->Point(i, data.ksi, data.weight);
+		ComputeRequiredData(data, data.ksi);
+
+		GetStatement()->Contribute(data, data.weight, ek, ef);
+	}
+}
+
+void CompElement::Solution(const VecDouble & intpoint, VecDouble & sol, TMatrix & dsol) const
+{
 }

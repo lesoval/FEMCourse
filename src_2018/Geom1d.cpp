@@ -29,17 +29,13 @@ Geom1d &Geom1d::operator=(const Geom1d &copy)
 	return *this;
 }
 
-void Geom1d::Shape(const VecDouble &xi, VecDouble &phi, TMatrix &dphi)
+void Geom1d::Shape(const VecDouble &xi, VecDouble &phi, Matrix &dphi)
 {
-	double ksi = xi[0];
-
-	phi[0] = (1 - ksi) / 2;
-	phi[1] = (1 + ksi) / 2;
-	dphi(0, 0) = -0.5;
-	dphi(0, 1) = 0.5;
+	VecInt orders(nSides, 1);
+	Shape1d::Shape(xi, orders, phi, dphi);
 }
 
-void Geom1d::X(const VecDouble &xi, TMatrix &NodeCo, VecDouble &x)
+void Geom1d::X(const VecDouble &xi, Matrix &NodeCo, VecDouble &x)
 {
 	int nRows = NodeCo.Rows();
 

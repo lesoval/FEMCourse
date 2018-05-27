@@ -413,6 +413,17 @@ IntRuleTetrahedron::IntRuleTetrahedron() :IntRule() {}
 IntRuleTetrahedron::IntRuleTetrahedron(int order)
 {
 	SetOrder(order);
+}
+
+void IntRuleTetrahedron::SetOrder(int order)
+{
+	if (order < 0 || order > 14)
+	{
+		std::cout << "IntRuleTetrahedron::SetOrder --> Invalid argument 'order'" << std::endl;
+		DebugStop();
+	}
+
+	fOrder = order;
 
 	// Define o número de pontos necessários para integração
 	int NRGAUPO[15] = { 1, 1, 4, 8, 14, 14, 24, 35, 46, 61, 81, 109, 140, 171, 236 };
@@ -554,15 +565,4 @@ IntRuleTetrahedron::IntRuleTetrahedron(int order)
 	default:
 		DebugStop();
 	}
-}
-
-void IntRuleTetrahedron::SetOrder(int order)
-{
-	if (order < 0 || order > 14)
-	{
-		std::cout << "IntRuleTetrahedron::SetOrder --> Invalid argument 'order'" << std::endl;
-		DebugStop();
-	}
-
-	fOrder = order;
 }
