@@ -8,8 +8,16 @@
 #ifndef Analysis_h
 #define Analysis_h
 
+#include "DataTypes.h"
+class CompMesh;
+class PostProcess;
+#include <string>
+
+
 class Analysis
 {
+protected:
+    
     CompMesh *cmesh;
     
     Matrix Solution;
@@ -17,6 +25,8 @@ class Analysis
     Matrix GlobalSystem;
     
     Matrix RightHandSide;
+    
+public:
     
     Analysis();
     

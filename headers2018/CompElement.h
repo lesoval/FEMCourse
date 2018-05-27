@@ -102,6 +102,10 @@ public:
     // Compute shape functions set at point x
     virtual void ShapeFunctions(const VecDouble &intpoint, VecDouble &phi, Matrix &dphi) const = 0;
     
+    // Compute the solution and its gradient at a parametric point
+    // for dsol the row indicates the direction, the column indicates the state variable
+    virtual void Solution(const VecDouble &intpoint, VecDouble &sol, TMatrix &dsol) const;
+    
     // Return the number of shape functions
     virtual int NShapeFunctions() const = 0;
     
