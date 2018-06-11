@@ -14,7 +14,6 @@
 #include <vector>
 //#include "TVecNum.h"
 #include "TMatrix.h"
-#include <functional>
 
 
 typedef TMatrix Matrix;

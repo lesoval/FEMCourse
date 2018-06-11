@@ -11,6 +11,8 @@
 #include "DataTypes.h"
 #include "IntRule.h"
 #include "IntPointData.h"
+#include "PostProcess.h"
+#include <functional>
 
 class CompMesh;
 class GeoElement;
@@ -99,12 +101,22 @@ public:
     // Compute the element stifness matrix and force vector
     virtual void CalcStiff(Matrix &ek, Matrix &ef) const;
     
+    // Compute error and exact solution
+    virtual void EvaluateError(std::function<void(const VecDouble &loc,VecDouble &val,Matrix &deriv)> fp,
+                               VecDouble &errors) const;
+    
     // Compute shape functions set at point x
     virtual void ShapeFunctions(const VecDouble &intpoint, VecDouble &phi, Matrix &dphi) const = 0;
     
     // Compute the solution and its gradient at a parametric point
     // for dsol the row indicates the direction, the column indicates the state variable
-    virtual void Solution(const VecDouble &intpoint, VecDouble &sol, TMatrix &dsol) const;
+    virtual void Solution(VecDouble &intpoint, PostProcess &defPostProc, VecDouble &sol, TMatrix &dsol) const;
+    
+    // Get Multiplying Coeficients
+    virtual void GetMultiplyingCoeficients(VecDouble &coefs) const = 0;
+    
+    /// Compute the error of the finite element approximation
+    double ComputeError(std::function<void(const VecDouble &co, VecDouble &sol, Matrix &dsol)> &exact,  VecDouble &errors);
     
     // Return the number of shape functions
     virtual int NShapeFunctions() const = 0;
@@ -112,8 +124,11 @@ public:
     // Set number of DOF
     virtual void SetNDOF(int64_t ndof) = 0;
     
-    // Se DOF index in vector position i
+    // Set DOF index in vector position i
     virtual void SetDOFIndex(int i, int64_t dofindex) = 0;
+    
+    // Get DOF index in vector position i
+    virtual int64_t GetDOFIndex(int i) = 0;
     
     // Return the number of degree of freedom
     virtual int NDOF() const = 0;
