@@ -6,6 +6,11 @@
 */
 
 #include "GeoElement.h"
+#include "CompElementTemplate.h"
+#include "Shape1d.h"
+#include "ShapeQuad.h"
+#include "ShapeTriangle.h"
+#include "ShapeTetrahedron.h"
 #include "tpanic.h"
 
 GeoElement::GeoElement() {}

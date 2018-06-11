@@ -6,6 +6,7 @@
 */
 
 #include "GeomTetrahedron.h"
+#include "ShapeTetrahedron.h"
 #include "tpanic.h"
 
 GeomTetrahedron::GeomTetrahedron() {}

@@ -9,8 +9,9 @@
 
 Poisson::Poisson() {}
 
-Poisson::Poisson(Matrix & perm)
+Poisson::Poisson(int materialid, Matrix & perm)
 {
+	SetMatID(materialid);
 	permeability = perm;
 }
 
@@ -44,15 +45,30 @@ void Poisson::SetPermeability(const Matrix & perm)
 	permeability = perm;
 }
 
+int Poisson::NEvalErrors() const
+{
+	return 0;
+}
+
 int Poisson::NState() const
 {
-	return 1;
+	return 2;
+}
+
+int Poisson::VariableIndex(const std::string & name)
+{
+	return 0;
+}
+
+int Poisson::NSolutionVariables(const PostProcVar var)
+{
+	return 0;
 }
 
 void Poisson::Contribute(IntPointData &integrationpointdata, double weight, Matrix &EK, Matrix &EF) const
 {
 	VecDouble &phi = integrationpointdata.phi;
-	Matrix &dphix = integrationpointdata.dphidx;
+	Matrix &dphidx = integrationpointdata.dphidx;
 	VecDouble  &x = integrationpointdata.x;
 	Matrix  &axes = integrationpointdata.axes;
 	double detjac = integrationpointdata.detjac;
@@ -67,11 +83,10 @@ void Poisson::Contribute(IntPointData &integrationpointdata, double weight, Matr
 	{
 		for (int j = 0; j < dim; j++)
 		{
-			EF(i, j) += detjac * weight * phi[i] * force[j];
+			EF(dim*i + j, 0) += detjac * weight * phi[i] * force[j];
 		}
 	}
 
-	Matrix perm = permeability;
 	Matrix gradphi(dim, nShapes);
 
 	for (int i = 0; i < nShapes; i++)
@@ -80,10 +95,12 @@ void Poisson::Contribute(IntPointData &integrationpointdata, double weight, Matr
 		{
 			for (int k = 0; k < dim; k++)
 			{
-				gradphi(k, i) += dphix(j, i)*axes(j, k);
+				gradphi(k, i) += dphidx(j, i)*axes(j, k);
 			}
 		}
 	}
+
+	Matrix perm = permeability;
 
 	for (int i = 0; i < nShapes; i++)
 	{
@@ -91,13 +108,23 @@ void Poisson::Contribute(IntPointData &integrationpointdata, double weight, Matr
 		{
 			for (int k = 0; k < dim; k++)
 			{
-				EK(i, j) += detjac * weight*(gradphi(k, i)*gradphi(k, j));
+				for (int l = 0; l < dim; l++)
+				{
+					for (int m = 0; m < dim; m++)
+					{
+						EK(dim*i + k, dim*j + l) += detjac * weight*(gradphi(k, i)*gradphi(m, j))*perm(m, l);
+					}
+				}
 			}
 		}
-	}	
+	}
 }
 
-std::vector<double> Poisson::PostProcess(const IntPointData & integrationpointdata, const PostProcVar var) const
+void Poisson::ContributeError(IntPointData & integrationpointdata, VecDouble & u_exact, Matrix & du_exact, VecDouble & errors) const
+{
+}
+
+std::vector<double> Poisson::PostProcessSolution(const IntPointData & integrationpointdata, const PostProcVar var) const
 {
 	return std::vector<double>();
 }

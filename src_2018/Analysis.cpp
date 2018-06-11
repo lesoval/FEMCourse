@@ -26,6 +26,10 @@ Analysis & Analysis::operator=(const Analysis & cp)
 	return *this;
 }
 
+Analysis::~Analysis()
+{
+}
+
 Analysis::Analysis(CompMesh * cmesh)
 {
 }
@@ -41,5 +45,13 @@ CompMesh * Analysis::Mesh() const
 }
 
 void Analysis::RunSimulation()
+{
+}
+
+void Analysis::PostProcessSolution(const std::string & filename, PostProcess & defPostProc) const
+{
+}
+
+void Analysis::PostProcessError(VecDouble error, std::ostream & out, PostProcess & defPostProc) const
 {
 }

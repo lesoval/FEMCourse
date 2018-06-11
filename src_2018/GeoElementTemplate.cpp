@@ -6,6 +6,7 @@
 */
 
 #include "GeoElementTemplate.h"
+#include "GeoMesh.h"
 #include "Geom1d.h"
 #include "GeomQuad.h"
 #include "GeomTriangle.h"
@@ -162,6 +163,7 @@ int GeoElementTemplate<TGeom>::WhichSide(VecInt & SideNodeIds)
 					(SideNodeIds[1] == SideNodeIndex(i, 0) && SideNodeIds[0] == SideNodeIndex(i, 1)))
 				{
 					return i;
+					break;
 				}
 			}
 			
@@ -179,6 +181,7 @@ int GeoElementTemplate<TGeom>::WhichSide(VecInt & SideNodeIds)
 					(SideNodeIds[2] == SideNodeIndex(i, 0) && SideNodeIds[0] == SideNodeIndex(i, 1) && SideNodeIds[1] == SideNodeIndex(i, 2)))
 				{
 					return i;
+					break;
 				}
 			}
 		}
@@ -196,6 +199,7 @@ int GeoElementTemplate<TGeom>::WhichSide(VecInt & SideNodeIds)
 					(SideNodeIds[3] == SideNodeIndex(i, 0) && SideNodeIds[0] == SideNodeIndex(i, 1) && SideNodeIds[1] == SideNodeIndex(i, 2) && SideNodeIds[2] == SideNodeIndex(i, 3)))
 				{
 					return i;
+					break;
 				}
 			}
 		}

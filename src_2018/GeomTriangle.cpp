@@ -6,6 +6,7 @@
 */
 
 #include "GeomTriangle.h"
+#include "ShapeTriangle.h"
 #include "tpanic.h"
 
 GeomTriangle::GeomTriangle() {}

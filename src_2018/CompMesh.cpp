@@ -7,7 +7,10 @@
 
 #include "CompMesh.h"
 #include "GeoElement.h"
+#include "GeoElementSide.h"
+#include "GeoMesh.h"
 #include "MathStatement.h"
+#include "tpanic.h"
 
 CompMesh::CompMesh() {}
 
@@ -112,26 +115,79 @@ void CompMesh::SetMathVec(const std::vector<MathStatement *> &mathvec)
 
 void CompMesh::AutoBuild()
 {
-	int nNodes = geomesh->NumNodes();
 	int nElements = geomesh->NumElements();
+	int nMaths = mathstatements.size();
 
 	SetNumberElement(nElements);
-	SetNumberMath(nElements);
-	SetNumberDOF(nNodes);
 
 	for (int i = 0; i < nElements; i++)
 	{
+		//Cria e insere o elemento na malha computacional
 		GeoElement *gel = geomesh->Element(i);
-		CompElement *CompEl = gel->CreateCompEl(this, i);
-		SetElement(i, CompEl);	
+		CompElement *cel = gel->CreateCompEl(this, i);
+		SetElement(i, cel);	
 
-		MathStatement *mat = GetMath(i);
-		CompEl->SetStatement(mat);
+		int mat = gel->Material();
+		//Insere a equação diferencial do elemento
+		if (mat >= 0 && mat < nMaths)
+		{
+			cel->SetStatement(GetMath(mat));
+		}
+		else
+		{
+			std::cout << "CompMesh::AutoBuild --> Invalid material" << std::endl;
+			DebugStop();
+		}
+
+		int nShapes = cel->NShapeFunctions();
+		int nStates = cel->GetStatement()->NState();
+		//Insere os indices dos DOF's nos nós do elemento
+		for (int j = 0; j < nShapes; j++)
+		{
+			GeoElementSide gelside(gel, j);
+			GeoElementSide neighbour = gel->Neighbour(j);
+			int neighId = neighbour.Element()->GetIndex();
+
+			if (gelside != neighbour)
+			{
+				if (neighId < i)
+				{
+					CompElement *cneigh = neighbour.Element()->GetReference();
+					cel->SetDOFIndex(j, cneigh->GetDOFIndex(neighbour.Side()));
+				}
+				else
+				{
+					cel->SetDOFIndex(j, dofs.size());
+					DOF cdof;
+					cdof.SetNShapeStateOrder(cel->ComputeNShapeFunctions(j, DefaultOrder), nStates, DefaultOrder);
+					dofs.push_back(cdof);
+				}
+			}
+			else
+			{
+				cel->SetDOFIndex(j, dofs.size());
+				DOF cdof;
+				cdof.SetNShapeStateOrder(cel->ComputeNShapeFunctions(j, DefaultOrder), nStates, DefaultOrder);
+				dofs.push_back(cdof);
+			}
+		}
 	}
+	this->Resequence();
 }
 
 void CompMesh::Resequence()
 {
+	int nDOF = GetNumberDOF();
+	int firstEq = 0;
+
+	for (int i = 0; i < nDOF; i++)
+	{
+		int nShapes = GetDOF(i).GetNShape();
+		int nStates = GetDOF(i).GetNState();
+
+		GetDOF(i).SetFirstEquation(firstEq);
+		firstEq += nShapes * nStates;
+	}
 }
 
 void CompMesh::Resequence(VecInt & DOFindices)

@@ -6,6 +6,7 @@
 */
 
 #include "Geom1d.h"
+#include "Shape1d.h"
 #include "tpanic.h"
 
 Geom1d::Geom1d(){}

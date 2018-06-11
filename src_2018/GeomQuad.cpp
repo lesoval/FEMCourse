@@ -6,6 +6,7 @@
 */
 
 #include "GeomQuad.h"
+#include "ShapeQuad.h"
 #include "tpanic.h"
 
 GeomQuad::GeomQuad() {}

@@ -6,8 +6,13 @@
 */
 
 #include "CompElementTemplate.h"
+#include "CompElement.h"
 #include "GeoElement.h"
 #include "CompMesh.h"
+#include "Shape1d.h"
+#include "ShapeQuad.h"
+#include "ShapeTetrahedron.h"
+#include "ShapeTriangle.h"
 
 template<class Shape>
 CompElementTemplate<Shape>::CompElementTemplate() : CompElement() {}
@@ -15,8 +20,13 @@ CompElementTemplate<Shape>::CompElementTemplate() : CompElement() {}
 template<class Shape>
 CompElementTemplate<Shape>::CompElementTemplate(int64_t ind, CompMesh *cmesh, GeoElement * geo) : CompElement(ind, cmesh, geo)
 {
+	int order = cmesh->GetDefaultOrder();
+	int nShapes = this->NShapeFunctions();
+
 	SetIntRule(&intrule);
-	intrule.SetOrder(cmesh->GetDefaultOrder());
+	intrule.SetOrder(order);
+
+	SetNDOF(nShapes);
 }
 
 template<class Shape>
@@ -55,7 +65,7 @@ void CompElementTemplate<Shape>::ShapeFunctions(const VecDouble & intpoint, VecD
 }
 
 template<class Shape>
-void CompElementTemplate<Shape>::GetMultiplyingCoeficients(VecDouble & coefs)
+void CompElementTemplate<Shape>::GetMultiplyingCoeficients(VecDouble & coefs) const
 {
 }
 
@@ -81,6 +91,12 @@ template<class Shape>
 void CompElementTemplate<Shape>::SetDOFIndex(int i, int64_t dofindex)
 {
 	dofindexes[i] = dofindex;
+}
+
+template<class Shape>
+int64_t CompElementTemplate<Shape>::GetDOFIndex(int i)
+{
+	return dofindexes[i];
 }
 
 template<class Shape>

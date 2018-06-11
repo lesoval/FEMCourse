@@ -6,6 +6,7 @@
 */
 
 #include "GeoMesh.h"
+#include "GeoElementSide.h"
 #include "tpanic.h"
 
 GeoMesh::GeoMesh() {}

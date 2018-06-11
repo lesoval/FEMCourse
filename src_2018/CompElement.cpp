@@ -13,9 +13,10 @@ CompElement::CompElement() {}
 
 CompElement::CompElement(int64_t ind, CompMesh *cmesh, GeoElement *geo)
 {
-	index = ind;
-	geoel = geo;
-	compmesh = cmesh;
+	SetIndex(ind);
+	SetGeoElement(geo);
+	SetCompMesh(cmesh);
+	geo->SetReference(this);
 }
 
 CompElement::CompElement(const CompElement &copy)
@@ -90,7 +91,7 @@ void CompElement::InitializeIntPointData(IntPointData &data) const
 {
 	int dim = Dimension();
 	int nShapes = NShapeFunctions();
-//	int nState = GetStatement()->NState();
+	int nState = GetStatement()->NState();
 	
 	data.weight = 0;
 	data.detjac = 0;
@@ -105,9 +106,9 @@ void CompElement::InitializeIntPointData(IntPointData &data) const
 	data.gradx.Resize(dim, nShapes);
 	data.dphidx.Resize(dim, nShapes);
 
-	//data.solution.resize(nState);
-	//data.dsoldksi.Resize(dim, nState);
-	//data.dsoldx.Resize(dim, nState);
+	data.solution.resize(nState);
+	data.dsoldksi.Resize(dim, nState);
+	data.dsoldx.Resize(dim, nState);
 
 }
 
@@ -128,13 +129,13 @@ void CompElement::Convert2Axes(const Matrix & dphi, const Matrix & jacinv, Matri
 	int nShapes = NShapeFunctions();
 	int dim = Dimension();
 
-	for (int i = 0; i < dim; i++)
+	for (int i = 0; i < nShapes; i++)
 	{
-		for (int j = 0; j < nShapes; j++)
+		for (int j = 0; j < dim; j++)
 		{
 			for (int k = 0; k < dim; k++)
 			{
-				dphidx(i, j) += dphi.GetVal(i, j)*jacinv.GetVal(k, i);
+				dphidx(j, i) += jacinv.GetVal(j, k)*dphi.GetVal(k, i);
 			}
 		}
 	}
@@ -147,10 +148,11 @@ void CompElement::CalcStiff(Matrix &ek, Matrix &ef) const
 	
 	int dim = Dimension();
 	int nShapes = NShapeFunctions();
+	int nStates = GetStatement()->NState();
 	int nIntpoints = intrule->NPoints();
 
-	ek.Resize(nShapes, nShapes);
-	ef.Resize(nShapes, dim);
+	ek.Resize(nShapes*nStates, nShapes*nStates);
+	ef.Resize(nShapes*nStates, 1);
 
 	for (int i = 0; i < nIntpoints; i++)
 	{
@@ -161,6 +163,15 @@ void CompElement::CalcStiff(Matrix &ek, Matrix &ef) const
 	}
 }
 
-void CompElement::Solution(const VecDouble & intpoint, VecDouble & sol, TMatrix & dsol) const
+void CompElement::EvaluateError(std::function<void(const VecDouble&loc, VecDouble&val, Matrix&deriv)> fp, VecDouble & errors) const
 {
+}
+
+void CompElement::Solution(VecDouble & intpoint, PostProcess & defPostProc, VecDouble & sol, TMatrix & dsol) const
+{
+}
+
+double CompElement::ComputeError(std::function<void(const VecDouble&co, VecDouble&sol, Matrix&dsol)>& exact, VecDouble & errors)
+{
+	return 0.0;
 }
