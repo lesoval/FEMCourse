@@ -67,6 +67,22 @@ void CompElementTemplate<Shape>::ShapeFunctions(const VecDouble & intpoint, VecD
 template<class Shape>
 void CompElementTemplate<Shape>::GetMultiplyingCoeficients(VecDouble & coefs) const
 {
+	CompMesh *cmesh = GetCompMesh();
+	int nDOF = NDOF();
+
+	for (int i = 0; i < nDOF; i++)
+	{
+		int dofId = dofindexes[i];
+		DOF elDOF = cmesh->GetDOF(dofId);
+		int nStates = elDOF.GetNState();
+
+		for (int j = 0; j < nStates; j++)
+		{
+			int firstEq = elDOF.GetFirstEquation() + j;
+			double sol = cmesh->Solution()[firstEq];
+			coefs.push_back(sol);
+		}
+	}
 }
 
 template<class Shape>

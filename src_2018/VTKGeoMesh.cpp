@@ -186,7 +186,7 @@ void VTKGeoMesh::PrintGMeshVTK(GeoMesh * gmesh, const std::string &filename)
         
         for(int t = 0; t < elNnodes; t++)
         {
-            VecDouble xi(ParamCo.Cols(),0.), xco(3,0.);
+            VecDouble xi(ParamCo.Cols(),0.), xco(3, 0.);
             for(int i=0; i< xi.size(); i++) xi[i] = ParamCo(t,i);
             gel->X(xi, xco);
             for (auto x:xco) {
@@ -268,18 +268,31 @@ void VTKGeoMesh::PrintCMeshVTK(CompMesh *cmesh, int dim, const std::string &file
                 node << x << " ";
             }
             node << std::endl;
-            VecDouble sol(1);
-            TMatrix dsol(2,1);
-			//cel->Solution(xi, 1, sol, dsol);
-            solution << sol[0] << " " << std::endl;
-            int i;
-            for (i=0; i<dsol.Rows(); i++) {
-                gradsol << dsol(i,0) << " ";
-            }
-            for( ; i<3; i++) gradsol << "0 ";
-            gradsol << std::endl;
-            actualNode++;
-            connectivity << " " << actualNode;
+            VecDouble sol;
+            TMatrix dsol;
+			cel->Solution(xi, 1, sol, dsol);
+			int i;
+			for (i = 0; i<sol.size(); i++) {
+				solution << sol[i] << " ";
+			}
+			for (; i<3; i++) solution << "0 ";
+			solution << std::endl;
+			for (i = 0; i<dsol.Rows(); i++) {
+				gradsol << dsol(i, i) << " ";
+			}
+			for (; i<3; i++) gradsol << "0 ";
+			gradsol << std::endl;
+			actualNode++;
+			connectivity << " " << actualNode;
+			/*solution << sol[0] << " " << std::endl;
+			int i;
+			for (i = 0; i<dsol.Rows(); i++) {
+				gradsol << dsol(i, 0) << " ";
+			}
+			for (; i<3; i++) gradsol << "0 ";
+			gradsol << std::endl;
+			actualNode++;
+			connectivity << " " << actualNode;*/
         }
         connectivity << std::endl;
         solution << std::endl;
@@ -312,11 +325,18 @@ void VTKGeoMesh::PrintCMeshVTK(CompMesh *cmesh, int dim, const std::string &file
     file << elindex.str();
     
     (file) << "POINT_DATA " << actualNode << std::endl;
-    (file) << "SCALARS " << "Solution" << " float" << std::endl << "LOOKUP_TABLE default\n";
+    /*(file) << "SCALARS " << "Solution" << " float" << std::endl << "LOOKUP_TABLE default\n";
     file << solution.str();
-    
-    (file) << "VECTORS " << "GradSolution" << " float" << std::endl;
-    file << gradsol.str();
+
+	(file) << "VECTORS " << "GradSolution" << " float" << std::endl;
+	file << gradsol.str();*/
+
+	(file) << "VECTORS " << "Solution" << " float" << std::endl;
+	file << solution.str();
+
+	(file) << "VECTORS " << "GradSolution" << " float" << std::endl;
+	file << gradsol.str();
+
     file.close();
 
 

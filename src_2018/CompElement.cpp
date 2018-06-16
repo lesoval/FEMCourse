@@ -97,7 +97,7 @@ void CompElement::InitializeIntPointData(IntPointData &data) const
 	data.detjac = 0;
 
 	data.axes.Resize(dim, dim);
-	data.x.resize(dim);
+	data.x.resize(3);
 	data.ksi.resize(dim);
 
 	data.phi.resize(nShapes);
@@ -135,7 +135,7 @@ void CompElement::Convert2Axes(const Matrix & dphi, const Matrix & jacinv, Matri
 		{
 			for (int k = 0; k < dim; k++)
 			{
-				dphidx(j, i) += jacinv.GetVal(j, k)*dphi.GetVal(k, i);
+				dphidx(j, i) += jacinv.GetVal(k, j)*dphi.GetVal(k, i);
 			}
 		}
 	}
@@ -167,8 +167,17 @@ void CompElement::EvaluateError(std::function<void(const VecDouble&loc, VecDoubl
 {
 }
 
-void CompElement::Solution(VecDouble & intpoint, PostProcess & defPostProc, VecDouble & sol, TMatrix & dsol) const
+void CompElement::Solution(VecDouble & intpoint, int var, VecDouble & sol, TMatrix & dsol) const
 {
+	IntPointData data;
+	InitializeIntPointData(data);
+	ComputeRequiredData(data, intpoint);
+	GetMultiplyingCoeficients(data.coefs);
+
+	data.ComputeSolution();
+
+	sol = data.solution;
+	dsol = data.dsoldx;
 }
 
 double CompElement::ComputeError(std::function<void(const VecDouble&co, VecDouble&sol, Matrix&dsol)>& exact, VecDouble & errors)

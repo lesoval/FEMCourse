@@ -66,17 +66,17 @@ void GeomTriangle::GradX(const VecDouble &xi, Matrix &NodeCo, VecDouble &x, Matr
 		std::cout << "Nodes matrix must be spacex3." << std::endl;
 		DebugStop();
 	}
-
-	gradx.Resize(NodeCo.Rows(), 2);
+	
+	gradx.Resize(nRows, 2);
 	gradx.Zero();
 
 	VecDouble phi(3);
 	TMatrix dphi(2, 3);
 	Shape(xi, phi, dphi);
 
-	for (int i = 0; i < NodeCo.Cols(); i++)
+	for (int i = 0; i < nCols; i++)
 	{
-		for (int j = 0; j < NodeCo.Rows(); j++)
+		for (int j = 0; j < nRows; j++)
 		{
 			gradx(j, 0) += NodeCo.GetVal(j, i)*dphi(0, i);
 			gradx(j, 1) += NodeCo.GetVal(j, i)*dphi(1, i);

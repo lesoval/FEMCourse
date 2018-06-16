@@ -39,10 +39,19 @@ void Geom1d::Shape(const VecDouble &xi, VecDouble &phi, Matrix &dphi)
 void Geom1d::X(const VecDouble &xi, Matrix &NodeCo, VecDouble &x)
 {
 	int nRows = NodeCo.Rows();
+	int nCols = NodeCo.Cols();
+
+	VecDouble phi(2);
+	Matrix dphi(2, 2);
+	Shape(xi, phi, dphi);
 
 	for (int i = 0; i < nRows; i++)
 	{
-		x[i] = NodeCo.GetVal(i, 0)*(1 - xi[i]) / 2 + NodeCo.GetVal(i, 1)*(1 + xi[i]) / 2;
+		x[i] = 0;
+		for (int j = 0; j < nCols; j++)
+		{
+			x[i] += phi[j] * NodeCo.GetVal(i, j);
+		}
 	}
 }
 

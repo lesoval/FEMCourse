@@ -73,27 +73,27 @@ void Poisson::Contribute(IntPointData &integrationpointdata, double weight, Matr
 	Matrix  &axes = integrationpointdata.axes;
 	double detjac = integrationpointdata.detjac;
 
-	int dim = integrationpointdata.x.size();
+	int nStates = NState();
 	int nShapes = integrationpointdata.phi.size();
 
-	VecDouble force(dim);
+	VecDouble force(nStates);
 	forceFunction(x, force);
 
 	for (int i = 0; i < nShapes; i++)
 	{
-		for (int j = 0; j < dim; j++)
+		for (int j = 0; j < nStates; j++)
 		{
-			EF(dim*i + j, 0) += detjac * weight * phi[i] * force[j];
+			EF(nStates*i + j, 0) += detjac * weight * phi[i] * force[j];
 		}
 	}
 
-	Matrix gradphi(dim, nShapes);
+	Matrix gradphi(nStates, nShapes);
 
 	for (int i = 0; i < nShapes; i++)
 	{
-		for (int j = 0; j < dim; j++)
+		for (int j = 0; j < nStates; j++)
 		{
-			for (int k = 0; k < dim; k++)
+			for (int k = 0; k < nStates; k++)
 			{
 				gradphi(k, i) += dphidx(j, i)*axes(j, k);
 			}
@@ -106,13 +106,13 @@ void Poisson::Contribute(IntPointData &integrationpointdata, double weight, Matr
 	{
 		for (int j = 0; j < nShapes; j++)
 		{
-			for (int k = 0; k < dim; k++)
+			for (int k = 0; k < nStates; k++)
 			{
-				for (int l = 0; l < dim; l++)
+				for (int l = 0; l < nStates; l++)
 				{
-					for (int m = 0; m < dim; m++)
+					for (int m = 0; m < nStates; m++)
 					{
-						EK(dim*i + k, dim*j + l) += detjac * weight*(gradphi(k, i)*gradphi(m, j))*perm(m, l);
+						EK(nStates*i + k, nStates*j + l) += detjac * weight*(gradphi(k, i)*gradphi(m, j))*perm(m, l);
 					}
 				}
 			}

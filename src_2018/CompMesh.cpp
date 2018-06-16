@@ -184,7 +184,7 @@ void CompMesh::Resequence()
 	{
 		int nShapes = GetDOF(i).GetNShape();
 		int nStates = GetDOF(i).GetNState();
-
+		
 		GetDOF(i).SetFirstEquation(firstEq);
 		firstEq += nShapes * nStates;
 	}

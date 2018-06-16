@@ -34,6 +34,7 @@ CompElement * GeoElement::CreateCompEl(CompMesh * mesh, int64_t index)
 {
 	switch (this->Type())
 	{
+
 	case EOned:
 
 		return new CompElementTemplate<Shape1d>(index, mesh, this);

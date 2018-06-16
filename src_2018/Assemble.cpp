@@ -74,7 +74,7 @@ void Assemble::Compute(Matrix & globmat, Matrix & rhs)
 
 		Matrix ek, ef;
 		cel->CalcStiff(ek, ef);
-
+		
 		VecInt firstEq(nShapes*nStates);
 
 		for (int j = 0; j < nShapes; j++)
@@ -91,7 +91,6 @@ void Assemble::Compute(Matrix & globmat, Matrix & rhs)
 		for (int j = 0; j < nShapes*nStates; j++)
 		{
 			rhs(firstEq[j], 0) = ef(j, 0);
-
 			for (int k = 0; k < nShapes*nStates; k++)
 			{
 				globmat(firstEq[j], firstEq[k]) += ek(j, k);

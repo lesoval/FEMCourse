@@ -79,64 +79,138 @@ void GeoElementTemplate<TGeom>::GradX(const VecDouble &xi, VecDouble &x, Matrix 
 
 template<class TGeom>
 void GeoElementTemplate<TGeom>::Jacobian(const Matrix &gradx, Matrix &jac, Matrix &axes, double &detjac, Matrix &jacinv)
-{
-	int dim = gradx.Rows();
-	int nShapes = gradx.Cols();
-
-	jac.Resize(dim, dim);
-	jacinv.Resize(dim, dim);
-	axes.Zero();
-
-	for (int i = 0; i < dim; i++)
-	{
-		for (int j = 0; j < dim; j++)
-		{
-			jac(i, j) = gradx.GetVal(j, i);
-		}
-	}
+{	
+	int nRows = gradx.Rows();
+	int dim = gradx.Cols();
 
 	switch (dim)
 	{
 	case 1:
-		detjac = jac(0, 0);
-		jacinv(0, 0) = 1 / detjac;
-		axes(0, 0) = 1;
+	{
+		jac.Resize(dim, dim);
+		axes.Resize(dim, 3);
+		jacinv.Resize(dim, dim);
+		jac.Zero();
 
+		/**  Definitions: v1 -> is the xi_direction of the Gradient */
+		VecDouble v_1(3, 0.);
+
+		for (int i = 0; i < nRows; i++) {
+			v_1[i] = gradx.GetVal(i, 0);
+		}
+
+		double norm_v_1 = 0.;
+		for (int i = 0; i < nRows; i++) {
+			norm_v_1 += v_1[i] * v_1[i];
+		}
+
+		norm_v_1 = sqrt(norm_v_1);
+		jac(0, 0) = norm_v_1;
+		detjac = norm_v_1;
+		jacinv(0, 0) = 1.0 / detjac;
+
+		detjac = fabs(detjac);
+
+		for (int i = 0; i < 3; i++) {
+			axes(0, i) = v_1[i] / norm_v_1;
+		}
+	}
 		break;
 
 	case 2:
-		detjac = jac(0, 0)*jac(1, 1) - jac(0, 1)*jac(1, 0);
+	{
+		jac.Resize(dim, dim);
+		axes.Resize(dim, 3);
+		jacinv.Resize(dim, dim);
+		jac.Zero();
 
-		jacinv(0, 0) = jac(1, 1) / detjac;
-		jacinv(1, 1) = jac(0, 0) / detjac;
+		//Definitions: v1 -> is the xi_direction of the Gradient, v2 -> is the eta_direction of the Gradient
+		VecDouble v_1(3, 0.), v_2(3, 0.);
+
+		//Definitions: v_1_til and v_2_til -> asscoiated orthonormal vectors to v_1 and v_2
+		VecDouble v_1_til(3, 0.), v_2_til(3, 0.);
+
+		for (int i = 0; i < nRows; i++) {
+			v_1[i] = gradx.GetVal(i, 0);
+			v_2[i] = gradx.GetVal(i, 1);
+		}
+
+		double norm_v_1_til = 0.0;
+		double norm_v_2_til = 0.0;
+		double v_1_dot_v_2 = 0.0;
+
+		for (int i = 0; i < 3; i++) {
+			norm_v_1_til += v_1[i] * v_1[i];
+			v_1_dot_v_2 += v_1[i] * v_2[i];
+		}
+		norm_v_1_til = sqrt(norm_v_1_til);
+
+		for (int i = 0; i < 3; i++) {
+			v_1_til[i] = v_1[i] / norm_v_1_til; // Normalizing
+			v_2_til[i] = v_2[i] - v_1_dot_v_2 * v_1_til[i] / norm_v_1_til;
+			norm_v_2_til += v_2_til[i] * v_2_til[i];
+		}
+		norm_v_2_til = sqrt(norm_v_2_til);
+
+
+		jac(0, 0) = norm_v_1_til;
+		jac(0, 1) = v_1_dot_v_2 / norm_v_1_til;
+		jac(1, 1) = norm_v_2_til;
+
+		detjac = jac(0, 0)*jac(1, 1) - jac(1, 0)*jac(0, 1);
+
+		jacinv(0, 0) = +jac(1, 1) / detjac;
+		jacinv(1, 1) = +jac(0, 0) / detjac;
 		jacinv(0, 1) = -jac(0, 1) / detjac;
 		jacinv(1, 0) = -jac(1, 0) / detjac;
-		
-		axes(0, 0) = 1;
-		axes(1, 1) = 1;
 
+		detjac = fabs(detjac);
+
+		for (int i = 0; i < 3; i++) {
+			v_2_til[i] /= norm_v_2_til; // Normalizing
+			axes(0, i) = v_1_til[i];
+			axes(1, i) = v_2_til[i];
+		}
+	}
 		break;
 
 	case 3:
-		double pos, neg;
-		pos = jac(0, 0)*jac(1, 1)*jac(2, 2) + jac(0, 1)*jac(1, 2)*jac(2, 0) + jac(0, 2)*jac(1, 0)*jac(2, 1);
-		neg = jac(0, 2)*jac(1, 1)*jac(2, 0) + jac(0, 1)*jac(1, 0)*jac(2, 2) + jac(0, 0)*jac(1, 2)*jac(2, 1);
-		detjac = pos - neg;
+	{
+		jac.Resize(dim, dim);
+		axes.Resize(dim, 3);
+		jacinv.Resize(dim, dim);
+		jac.Zero();
 
-		jacinv(0, 0) = (-jac(1, 2)*jac(2, 1) + jac(1, 1)*jac(2, 2)) / detjac;
-		jacinv(0, 1) = (jac(0, 2)*jac(2, 1) - jac(0, 1)*jac(2, 2)) / detjac;
-		jacinv(0, 2) = (-jac(0, 2)*jac(1, 1) + jac(0, 1)*jac(1, 2)) / detjac;
-		jacinv(1, 0) = (jac(1, 2)*jac(2, 0) - jac(1, 0)*jac(2, 2)) / detjac;
-		jacinv(1, 1) = (-jac(0, 2)*jac(2, 0) + jac(0, 0)*jac(2, 2)) / detjac;
-		jacinv(1, 2) = (jac(0, 2)*jac(1, 0) - jac(0, 0)*jac(1, 2)) / detjac;
-		jacinv(2, 0) = (-jac(1, 1)*jac(2, 0) + jac(1, 0)*jac(2, 1)) / detjac;
-		jacinv(2, 1) = (jac(0, 1)*jac(2, 0) - jac(0, 0)*jac(2, 1)) / detjac;
-		jacinv(2, 2) = (-jac(0, 1)*jac(1, 0) + jac(0, 0)*jac(1, 1)) / detjac;
+		for (int i = 0; i < nRows; i++) {
+			jac(i, 0) = gradx.GetVal(i, 0);
+			jac(i, 1) = gradx.GetVal(i, 1);
+			jac(i, 2) = gradx.GetVal(i, 2);
+		}
 
+		detjac -= jac(0, 2)*jac(1, 1)*jac(2, 0);//- a02 a11 a20
+		detjac += jac(0, 1)*jac(1, 2)*jac(2, 0);//+ a01 a12 a20
+		detjac += jac(0, 2)*jac(1, 0)*jac(2, 1);//+ a02 a10 a21
+		detjac -= jac(0, 0)*jac(1, 2)*jac(2, 1);//- a00 a12 a21
+		detjac -= jac(0, 1)*jac(1, 0)*jac(2, 2);//- a01 a10 a22
+		detjac += jac(0, 0)*jac(1, 1)*jac(2, 2);//+ a00 a11 a22
+
+		jacinv(0, 0) = (-jac(1, 2)*jac(2, 1) + jac(1, 1)*jac(2, 2)) / detjac;//-a12 a21 + a11 a22
+		jacinv(0, 1) = (jac(0, 2)*jac(2, 1) - jac(0, 1)*jac(2, 2)) / detjac;//a02 a21 - a01 a22
+		jacinv(0, 2) = (-jac(0, 2)*jac(1, 1) + jac(0, 1)*jac(1, 2)) / detjac;//-a02 a11 + a01 a12
+		jacinv(1, 0) = (jac(1, 2)*jac(2, 0) - jac(1, 0)*jac(2, 2)) / detjac;//a12 a20 - a10 a22
+		jacinv(1, 1) = (-jac(0, 2)*jac(2, 0) + jac(0, 0)*jac(2, 2)) / detjac;//-a02 a20 + a00 a22
+		jacinv(1, 2) = (jac(0, 2)*jac(1, 0) - jac(0, 0)*jac(1, 2)) / detjac;//a02 a10 - a00 a12
+		jacinv(2, 0) = (-jac(1, 1)*jac(2, 0) + jac(1, 0)*jac(2, 1)) / detjac;//-a11 a20 + a10 a21
+		jacinv(2, 1) = (jac(0, 1)*jac(2, 0) - jac(0, 0)*jac(2, 1)) / detjac;//a01 a20 - a00 a21
+		jacinv(2, 2) = (-jac(0, 1)*jac(1, 0) + jac(0, 0)*jac(1, 1)) / detjac;//-a01 a10 + a00 a11
+
+																			 //            detjac = fabs(detjac);
+
+		axes.Zero();
 		axes(0, 0) = 1.0;
 		axes(1, 1) = 1.0;
 		axes(2, 2) = 1.0;
-
+	}
 		break;
 
 	default:
