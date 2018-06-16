@@ -10,7 +10,7 @@
 
 #include "MathStatement.h"
 #include "DataTypes.h"
-#include  "IntPointData.h"
+#include "IntPointData.h"
 #include <functional>
 
 class Poisson : public MathStatement
@@ -82,10 +82,7 @@ public:
     // Method to implement error over element's volume
     virtual void ContributeError(IntPointData &integrationpointdata, VecDouble &u_exact, Matrix &du_exact, VecDouble &errors) const;
     
-    
     // Prepare and print post processing data
     virtual std::vector<double> PostProcessSolution(const IntPointData &integrationpointdata, const PostProcVar var) const;
-
-
 };
 #endif /* Poisson_h */
