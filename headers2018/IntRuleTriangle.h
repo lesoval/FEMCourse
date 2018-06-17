@@ -10,6 +10,7 @@
 #define __FemSC__IntRuleTriangle__
 
 #include <stdio.h>
+#include "TVec.h"
 #include "DataTypes.h"
 #include "IntRule.h"
 

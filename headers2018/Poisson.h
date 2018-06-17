@@ -10,7 +10,7 @@
 
 #include "MathStatement.h"
 #include "DataTypes.h"
-#include "IntPointData.h"
+#include  "IntPointData.h"
 #include <functional>
 
 class Poisson : public MathStatement
@@ -20,6 +20,8 @@ class Poisson : public MathStatement
     
     // Force funtion related to Poisson math statement
     std::function<void(const VecDouble &co, VecDouble &result)> forceFunction;
+    
+    std::function<void(const VecDouble &loc, VecDouble &result, Matrix &deriv)> SolutionExact;
     
 public:
     
@@ -61,6 +63,12 @@ public:
         forceFunction = f;
     }
     
+    // Set the exact solution related to Poisson math statement
+    void SetExactSolution(const std::function<void(const VecDouble &loc, VecDouble &result, Matrix &deriv)> &Exact)
+    {
+        SolutionExact = Exact;
+    }
+    
     // returns the integrable dimension of the material
     int Dimension() const {return 2;}
     
@@ -69,8 +77,10 @@ public:
     // Return the number of state variables
     virtual int NState() const;
     
+    virtual int VariableIndex(const PostProcVar var) const;
+    
     // Return the variable index associated with the name
-    virtual int VariableIndex(const std::string &name);
+    virtual PostProcVar VariableIndex(const std::string &name);
     
     // Return the number of variables associated with the variable indexed by var. Param var Index variable into the solution, is obtained by calling VariableIndex
     virtual int NSolutionVariables(const PostProcVar var);
@@ -83,6 +93,10 @@ public:
     virtual void ContributeError(IntPointData &integrationpointdata, VecDouble &u_exact, Matrix &du_exact, VecDouble &errors) const;
     
     // Prepare and print post processing data
-    virtual std::vector<double> PostProcessSolution(const IntPointData &integrationpointdata, const PostProcVar var) const;
+    virtual std::vector<double> PostProcessSolution(const IntPointData &integrationpointdata, const int var) const;
+
+    virtual double Inner(Matrix &S,Matrix &T) const;
+    
+    
 };
 #endif /* Poisson_h */

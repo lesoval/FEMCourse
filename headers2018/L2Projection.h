@@ -15,12 +15,21 @@
 
 class L2Projection : public MathStatement
 {
+    // Boundary condition ID
+    int BCType = 0;
     
     // L2 projection matrix
     Matrix projection;
     
+    // First value of boundary condition
+    Matrix BCVal1;
+    // Second value of boundary condition
+    Matrix BCVal2;
+    
     // Force funtion related to L2 projection math statement
     std::function<void(const VecDouble &co, VecDouble &result)> forceFunction;
+    
+    std::function<void(const VecDouble &loc, VecDouble &result, Matrix &deriv)> SolutionExact;
     
 public:
     
@@ -30,13 +39,15 @@ public:
     L2Projection();
     
     // Constructor of L2Projection
-    L2Projection(int materialid, Matrix &perm);
+    L2Projection(int bctype, int materialid, Matrix &proj, Matrix Val1, Matrix Val2);
     
     // Copy constructor of L2Projection
     L2Projection(const L2Projection &copy);
     
     // Operator of copy
     L2Projection &operator=(const L2Projection &copy);
+    
+    int GetBCType() const { return BCType; }
     
     // Method for creating a copy of the element
     virtual L2Projection *Clone() const;
@@ -50,6 +61,18 @@ public:
     // Set the L2 projection matrix
     void SetProjectionMatrix(const Matrix &proj);
 
+    // Return Val1
+    Matrix Val1() const
+    {
+        return BCVal1;
+    }
+    
+    // Return Val2
+    Matrix Val2() const
+    {
+        return BCVal2;
+    }
+    
     // Return the force function related to L2 projection math statement
     std::function<void(const VecDouble &co, VecDouble &result)> GetForceFunction() const
     {
@@ -62,14 +85,22 @@ public:
         forceFunction = f;
     }
     
+    // Set the exact solution related to L2 projection math statement
+    void SetExactSolution(const std::function<void(const VecDouble &loc, VecDouble &result, Matrix &deriv)> &Exact)
+    {
+        SolutionExact = Exact;
+    }
+    
     // Return the number of errors
     virtual int NEvalErrors() const;
     
     // Return the number of state variables
     virtual int NState() const;
     
+    virtual int VariableIndex(const PostProcVar var) const;
+    
     // Return the variable index associated with the name
-    virtual int VariableIndex(const std::string &name);
+    virtual PostProcVar VariableIndex(const std::string &name);
     
     // Return the number of variables associated with the variable indexed by var. Param var Index variable into the solution, is obtained by calling VariableIndex
     virtual int NSolutionVariables(const PostProcVar var);
@@ -81,7 +112,7 @@ public:
     virtual void ContributeError(IntPointData &integrationpointdata, VecDouble &u_exact, Matrix &du_exact, VecDouble &errors) const;
     
     // Prepare and print post processing data
-    virtual std::vector<double> PostProcessSolution(const IntPointData &integrationpointdata, const PostProcVar var) const;
+    virtual std::vector<double> PostProcessSolution(const IntPointData &integrationpointdata, const int var) const;
     
     
 };

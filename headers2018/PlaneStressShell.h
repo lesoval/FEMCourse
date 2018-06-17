@@ -85,6 +85,6 @@ public:
 	virtual void ContributeError(IntPointData &integrationpointdata, VecDouble &u_exact, Matrix &du_exact, VecDouble &errors) const;
 
 	// Prepare and print post processing data
-	virtual std::vector<double> PostProcessSolution(const IntPointData &integrationpointdata, const PostProcVar var) const;
+	virtual std::vector<double> PostProcessSolution(const IntPointData &integrationpointdata, const int var) const;
 };
 #endif /* PlaneStressShell_h */

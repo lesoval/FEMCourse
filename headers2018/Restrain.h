@@ -1,19 +1,19 @@
 /*
-*  OnlyForce.h
+*  Restrain.h
 *
 *  Created by Leandro Valdez on 6/11/18.
 *
 */
 
-#ifndef OnlyForce_h
-#define OnlyForce_h
+#ifndef Restrain_h
+#define Restrain_h
 
 #include "MathStatement.h"
 #include "DataTypes.h"
 #include "IntPointData.h"
 #include <functional>
 
-class OnlyForce : public MathStatement
+class Restrain : public MathStatement
 {
 
 	//Force funtion related to ElasticSell math statement
@@ -21,23 +21,23 @@ class OnlyForce : public MathStatement
 
 public:
 
-	//Default constructor of OnlyForce
-	OnlyForce();
+	//Default constructor of Restrain
+	Restrain();
 
-	//Constructor of OnlyForce
-	OnlyForce(int materialid);
+	//Constructor of Restrain
+	Restrain(int materialid);
 
-	//Copy constructor of OnlyForce
-	OnlyForce(const OnlyForce &copy);
+	//Copy constructor of Restrain
+	Restrain(const Restrain &copy);
 
 	//Operator of copy
-	OnlyForce &operator=(const OnlyForce &copy);
+	Restrain &operator=(const Restrain &copy);
 
 	// Method for creating a copy of the element
-	virtual OnlyForce *Clone() const;
+	virtual Restrain *Clone() const;
 
-	//Destructor of OnlyForce
-	virtual ~OnlyForce();
+	//Destructor of Restrain
+	virtual ~Restrain();
 
 	//Return the force function
 	std::function<void(const VecDouble &co, VecDouble &result)> GetForceFunction() const
@@ -65,5 +65,4 @@ public:
 	// Prepare and print post processing data
 	virtual std::vector<double> PostProcessSolution(const IntPointData &integrationpointdata, const int var) const;
 };
-#endif /* OnlyForce_h */
-
+#endif /* Restrain_h */

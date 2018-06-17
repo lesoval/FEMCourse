@@ -10,6 +10,7 @@
 #define __FemSC__IntRuleTetrahedron__
 
 #include <stdio.h>
+#include "TVec.h"
 #include "TMatrix.h"
 #include "IntRule.h"
 
