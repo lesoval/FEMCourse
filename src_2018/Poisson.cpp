@@ -55,9 +55,14 @@ int Poisson::NState() const
 	return 2;
 }
 
-int Poisson::VariableIndex(const std::string & name)
+int Poisson::VariableIndex(const PostProcVar var) const
 {
 	return 0;
+}
+
+Poisson::PostProcVar Poisson::VariableIndex(const std::string & name)
+{
+	return PostProcVar();
 }
 
 int Poisson::NSolutionVariables(const PostProcVar var)
@@ -124,7 +129,12 @@ void Poisson::ContributeError(IntPointData & integrationpointdata, VecDouble & u
 {
 }
 
-std::vector<double> Poisson::PostProcessSolution(const IntPointData & integrationpointdata, const PostProcVar var) const
+std::vector<double> Poisson::PostProcessSolution(const IntPointData & integrationpointdata, const int var) const
 {
 	return std::vector<double>();
+}
+
+double Poisson::Inner(Matrix & S, Matrix & T) const
+{
+	return 0.0;
 }

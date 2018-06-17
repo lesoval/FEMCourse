@@ -179,8 +179,3 @@ void CompElement::Solution(VecDouble & intpoint, int var, VecDouble & sol, TMatr
 	sol = data.solution;
 	dsol = data.dsoldx;
 }
-
-double CompElement::ComputeError(std::function<void(const VecDouble&co, VecDouble&sol, Matrix&dsol)>& exact, VecDouble & errors)
-{
-	return 0.0;
-}

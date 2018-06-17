@@ -41,8 +41,8 @@ void Geom1d::X(const VecDouble &xi, Matrix &NodeCo, VecDouble &x)
 	int nRows = NodeCo.Rows();
 	int nCols = NodeCo.Cols();
 
-	VecDouble phi(2);
-	Matrix dphi(2, 2);
+	VecDouble phi;
+	Matrix dphi;
 	Shape(xi, phi, dphi);
 
 	for (int i = 0; i < nRows; i++)
@@ -70,8 +70,8 @@ void Geom1d::GradX(const VecDouble &xi, Matrix &NodeCo, VecDouble &x, Matrix &gr
 	gradx.Resize(nRows, 1);
 	gradx.Zero();
 
-	VecDouble phi(2);
-	TMatrix dphi(2, 2);
+	VecDouble phi;
+	TMatrix dphi;
 	Shape(xi, phi, dphi);
 
 	for (int i = 0; i < nCols; i++)

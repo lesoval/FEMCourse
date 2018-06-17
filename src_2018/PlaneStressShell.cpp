@@ -152,14 +152,14 @@ void PlaneStressShell::Contribute(IntPointData & intpointdata, double weight, Ma
 	Bt.Transpose();
 	Matrix C = GetConstitutive();
 
-	EK = Bt * C * B* weight* detjac * t;	
+	EK = Bt * C * B* weight* detjac * t;
 }
 
 void PlaneStressShell::ContributeError(IntPointData & integrationpointdata, VecDouble & u_exact, Matrix & du_exact, VecDouble & errors) const
 {
 }
 
-std::vector<double> PlaneStressShell::PostProcessSolution(const IntPointData & integrationpointdata, const PostProcVar var) const
+std::vector<double> PlaneStressShell::PostProcessSolution(const IntPointData & integrationpointdata, const int var) const
 {
 	return std::vector<double>();
 }

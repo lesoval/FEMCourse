@@ -9,10 +9,8 @@
 
 L2Projection::L2Projection() {}
 
-L2Projection::L2Projection(int materialid, Matrix &perm)
+L2Projection::L2Projection(int bctype, int materialid, Matrix & proj, Matrix Val1, Matrix Val2)
 {
-	SetMatID(materialid);
-	projection = perm;
 }
 
 L2Projection::L2Projection(const L2Projection &copy)
@@ -55,9 +53,14 @@ int L2Projection::NState() const
 	return 1;
 }
 
-int L2Projection::VariableIndex(const std::string & name)
+int L2Projection::VariableIndex(const PostProcVar var) const
 {
 	return 0;
+}
+
+L2Projection::PostProcVar L2Projection::VariableIndex(const std::string & name)
+{
+	return PostProcVar();
 }
 
 int L2Projection::NSolutionVariables(const PostProcVar var)
@@ -67,14 +70,13 @@ int L2Projection::NSolutionVariables(const PostProcVar var)
 
 void L2Projection::Contribute(IntPointData &integrationpointdata, double weight, Matrix &EK, Matrix &EF) const
 {
-
 }
 
 void L2Projection::ContributeError(IntPointData & integrationpointdata, VecDouble & u_exact, Matrix & du_exact, VecDouble & errors) const
 {
 }
 
-std::vector<double> L2Projection::PostProcessSolution(const IntPointData & integrationpointdata, const PostProcVar var) const
+std::vector<double> L2Projection::PostProcessSolution(const IntPointData & integrationpointdata, const int var) const
 {
 	return std::vector<double>();
 }

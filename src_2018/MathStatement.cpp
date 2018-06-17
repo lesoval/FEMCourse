@@ -7,6 +7,8 @@
 
 #include "MathStatement.h"
 
+double MathStatement::gBigNumber = DBL_MAX;
+
 MathStatement::MathStatement() {}
 
 MathStatement::MathStatement(const MathStatement &copy)
@@ -23,3 +25,7 @@ MathStatement &MathStatement::operator=(const MathStatement &copy)
 }
 
 MathStatement::~MathStatement() {}
+
+void MathStatement::Axes2XYZ(const Matrix & dudaxes, Matrix & dudx, const Matrix & axesv, bool colMajor) const
+{
+}

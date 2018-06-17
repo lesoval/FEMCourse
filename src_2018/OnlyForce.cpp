@@ -1,5 +1,5 @@
 /*
-*  OnlyForce.h
+*  OnlyForce.cpp
 *
 *  Created by Leandro Valdez on 6/11/18.
 *
@@ -70,4 +70,9 @@ void OnlyForce::Contribute(IntPointData & intpointdata, double weight, Matrix & 
 
 void OnlyForce::ContributeError(IntPointData & integrationpointdata, VecDouble & u_exact, Matrix & du_exact, VecDouble & errors) const
 {
+}
+
+std::vector<double> OnlyForce::PostProcessSolution(const IntPointData & integrationpointdata, const int var) const
+{
+	return std::vector<double>();
 }

@@ -41,8 +41,8 @@ void GeomTetrahedron::X(const VecDouble &xi, Matrix &NodeCo, VecDouble &x)
 	int nRows = NodeCo.Rows();
 	int nCols = NodeCo.Cols();
 
-	VecDouble phi(4);
-	Matrix dphi(3, 4);
+	VecDouble phi;
+	Matrix dphi;
 	Shape(xi, phi, dphi);
 
 	for (int i = 0; i < nRows; i++)
@@ -70,8 +70,8 @@ void GeomTetrahedron::GradX(const VecDouble &xi, Matrix &NodeCo, VecDouble &x, M
 	gradx.Resize(nRows, 3);
 	gradx.Zero();
 
-	VecDouble phi(4);
-	TMatrix dphi(3, 4);
+	VecDouble phi;
+	TMatrix dphi;
 	Shape(xi, phi, dphi);
 
 	for (int i = 0; i < nCols; i++)

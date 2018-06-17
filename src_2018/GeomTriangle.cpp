@@ -41,8 +41,8 @@ void GeomTriangle::X(const VecDouble &xi, Matrix &NodeCo, VecDouble &x)
 	int nRows = NodeCo.Rows();
 	int nCols = NodeCo.Cols();
 
-	VecDouble phi(3);
-	Matrix dphi(2, 3);
+	VecDouble phi;
+	Matrix dphi;
 	Shape(xi, phi, dphi);
 
 	for (int i = 0; i < nRows; i++)
@@ -70,8 +70,8 @@ void GeomTriangle::GradX(const VecDouble &xi, Matrix &NodeCo, VecDouble &x, Matr
 	gradx.Resize(nRows, 2);
 	gradx.Zero();
 
-	VecDouble phi(3);
-	TMatrix dphi(2, 3);
+	VecDouble phi;
+	TMatrix dphi;
 	Shape(xi, phi, dphi);
 
 	for (int i = 0; i < nCols; i++)
