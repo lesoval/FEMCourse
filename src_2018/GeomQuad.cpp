@@ -33,14 +33,14 @@ GeomQuad &GeomQuad::operator=(const GeomQuad &copy)
 void GeomQuad::Shape(const VecDouble & xi, VecDouble & phi, Matrix & dphi)
 {
 	VecInt orders(nSides, 1);
-	ShapeQuad::Shape(xi, orders, phi, dphi);
+	ShapeQuad::Shape(xi, orders, phi, dphi);	
 }
 
 void GeomQuad::X(const VecDouble &xi, Matrix &NodeCo, VecDouble &x)
 {
 	int nRows = NodeCo.Rows();
 	int nCols = NodeCo.Cols();
-
+	
 	VecDouble phi;
 	Matrix dphi;
 	Shape(xi, phi, dphi);
@@ -73,7 +73,7 @@ void GeomQuad::GradX(const VecDouble &xi, Matrix &NodeCo, VecDouble &x, Matrix &
 	VecDouble phi;
 	TMatrix dphi;
 	Shape(xi, phi, dphi);
-
+	
 	for (int i = 0; i < nCols; i++)
 	{
 		for (int j = 0; j < nRows; j++)

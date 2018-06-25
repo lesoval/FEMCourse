@@ -49,21 +49,23 @@ int OnlyForce::NState() const
 
 void OnlyForce::Contribute(IntPointData & intpointdata, double weight, Matrix & EK, Matrix & EF) const
 {
-	VecDouble &phi = intpointdata.phi;
-	VecDouble  &x = intpointdata.x;
-	double detjac = intpointdata.detjac;
-
-	int nStates = NState();
-	int nShapes = intpointdata.phi.size();
-
-	VecDouble force(nStates);
-	forceFunction(x, force);
-
-	for (int i = 0; i < nShapes; i++)
+	if (forceFunction != NULL)
 	{
-		for (int j = 0; j < nStates; j++)
+		VecDouble &phi = intpointdata.phi;
+		VecDouble  &x = intpointdata.x;
+		double detjac = intpointdata.detjac;
+
+		int nStates = NState();
+		int nShapes = intpointdata.phi.size();
+
+		VecDouble force(nStates);
+		forceFunction(x, force);
+		for (int i = 0; i < nShapes; i++)
 		{
-			EF(nStates*i + j, 0) += detjac * weight * phi[i] * force[j];
+			for (int j = 0; j < nStates; j++)
+			{
+				EF(nStates*i + j, 0) += detjac * weight * phi[i] * force[j];
+			}
 		}
 	}
 }

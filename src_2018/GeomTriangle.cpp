@@ -73,7 +73,7 @@ void GeomTriangle::GradX(const VecDouble &xi, Matrix &NodeCo, VecDouble &x, Matr
 	VecDouble phi;
 	TMatrix dphi;
 	Shape(xi, phi, dphi);
-
+	
 	for (int i = 0; i < nCols; i++)
 	{
 		for (int j = 0; j < nRows; j++)

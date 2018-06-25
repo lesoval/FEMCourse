@@ -60,7 +60,7 @@ void Restrain::Contribute(IntPointData & intpointdata, double weight, Matrix & E
 	{
 		for (int j = 0; j < nStates; j++)
 		{
-			EK(nStates*i + j, nStates*i + j) += gBigNumber;
+			EK(nStates*i + j, nStates*i + j) += gBigNumber * phi[i] * phi[i] * detjac*weight;
 		}
 	}
 }

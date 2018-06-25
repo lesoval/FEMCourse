@@ -65,7 +65,7 @@ void CompMesh::SetDOF(int64_t index, const DOF &dof)
 
 void CompMesh::SetMathStatement(int index, MathStatement *math)
 {
-	mathstatements[index] = math;
+	mathstatements[index - 1] = math;
 }
 
 DOF &CompMesh::GetDOF(int64_t dofindex)
@@ -80,7 +80,7 @@ CompElement *CompMesh::GetElement(int64_t elindex) const
 
 MathStatement *CompMesh::GetMath(int matindex) const
 {
-	return mathstatements[matindex];
+	return mathstatements[matindex - 1];
 }
 
 std::vector<CompElement *> CompMesh::GetElementVec() const
@@ -129,7 +129,7 @@ void CompMesh::AutoBuild()
 
 		int mat = gel->Material();
 		//Insere a equação diferencial do elemento
-		if (mat >= 0 && mat < nMaths)
+		if (mat > 0 && mat <= nMaths)
 		{
 			cel->SetStatement(GetMath(mat));
 		}

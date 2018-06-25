@@ -1,29 +1,29 @@
 /*
-*  PlaneStressShell.cpp
+*  PlaneStrainShell.cpp
 *
-*  Created by Leandro Valdez on 6/11/18.
+*  Created by Leandro Valdez on 6/24/18.
 *
 */
 
-#include "PlaneStressShell.h"
+#include "PlaneStrainShell.h"
 
-PlaneStressShell::PlaneStressShell()
+PlaneStrainShell::PlaneStrainShell()
 {
 }
 
-PlaneStressShell::PlaneStressShell(int materialid, double E, double ni, double thickness)
+PlaneStrainShell::PlaneStrainShell(int materialid, double E, double ni, double thickness)
 {
 	SetMatID(materialid);
 	cMat = Constitutive(E, ni);
 	t = thickness;
 }
 
-PlaneStressShell::PlaneStressShell(const PlaneStressShell & copy)
+PlaneStrainShell::PlaneStrainShell(const PlaneStrainShell & copy)
 {
 	this->operator=(copy);
 }
 
-PlaneStressShell & PlaneStressShell::operator=(const PlaneStressShell & copy)
+PlaneStrainShell & PlaneStrainShell::operator=(const PlaneStrainShell & copy)
 {
 	cMat = copy.cMat;
 	forceFunction = copy.forceFunction;
@@ -31,22 +31,22 @@ PlaneStressShell & PlaneStressShell::operator=(const PlaneStressShell & copy)
 	return *this;
 }
 
-PlaneStressShell * PlaneStressShell::Clone() const
+PlaneStrainShell * PlaneStrainShell::Clone() const
 {
-	return new PlaneStressShell(*this);
+	return new PlaneStrainShell(*this);
 }
 
-PlaneStressShell::~PlaneStressShell()
+PlaneStrainShell::~PlaneStrainShell()
 {
 }
 
-Matrix PlaneStressShell::Constitutive(double E, double ni)
+Matrix PlaneStrainShell::Constitutive(double E, double ni)
 {
 	Matrix m(3, 3);
 
-	m(0, 0) = 1;	m(0, 1) = ni;	m(0, 2) = 0;
-	m(1, 0) = ni;	m(1, 1) = 1;	m(1, 2) = 0;
-	m(2, 0) = 0;	m(2, 1) = 0;	m(2, 2) = (1 - ni) / 2;
+	m(0, 0) = 1 - ni;	m(0, 1) = ni;		m(0, 2) = 0;
+	m(1, 0) = ni;		m(1, 1) = 1 - ni;	m(1, 2) = 0;
+	m(2, 0) = 0;		m(2, 1) = 0;		m(2, 2) = (1 - 2 * ni) / 2;
 
 	Matrix c(3, 3);
 
@@ -54,33 +54,33 @@ Matrix PlaneStressShell::Constitutive(double E, double ni)
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			c(i, j) = (E / (1 - ni * ni))*m(i, j);
+			c(i, j) = (E / (1 + ni)*(1 - 2 * ni))*m(i, j);
 		}
 	}
 	return c;
 }
 
-Matrix PlaneStressShell::GetConstitutive() const
+Matrix PlaneStrainShell::GetConstitutive() const
 {
 	return cMat;
 }
 
-int PlaneStressShell::NEvalErrors() const
+int PlaneStrainShell::NEvalErrors() const
 {
 	return 3;
 }
 
-int PlaneStressShell::NState() const
+int PlaneStrainShell::NState() const
 {
 	return 2;
 }
 
-int PlaneStressShell::VariableIndex(const std::string & name)
+int PlaneStrainShell::VariableIndex(const std::string & name)
 {
 	return 0;
 }
 
-int PlaneStressShell::NSolutionVariables(const PostProcVar var)
+int PlaneStrainShell::NSolutionVariables(const PostProcVar var)
 {
 	switch (var)
 	{
@@ -103,17 +103,17 @@ int PlaneStressShell::NSolutionVariables(const PostProcVar var)
 	}
 }
 
-void PlaneStressShell::Contribute(IntPointData & intpointdata, double weight, Matrix & EK, Matrix & EF) const
+void PlaneStrainShell::Contribute(IntPointData & intpointdata, double weight, Matrix & EK, Matrix & EF) const
 {
 	VecDouble &phi = intpointdata.phi;
 	Matrix &dphidx = intpointdata.dphidx;
 	VecDouble  &x = intpointdata.x;
 	Matrix  &axes = intpointdata.axes;
 	double detjac = intpointdata.detjac;
-	
+
 	int nStates = NState();
 	int nShapes = intpointdata.phi.size();
-		
+
 	if (forceFunction != NULL)
 	{
 		VecDouble force(nStates);
@@ -139,7 +139,7 @@ void PlaneStressShell::Contribute(IntPointData & intpointdata, double weight, Ma
 		B(2, nStates*j) = gradphi(1, j);
 		B(2, nStates*j + 1) = gradphi(0, j);
 	}
-	
+
 	Matrix Bt = B;
 	Bt.Transpose();
 	Matrix C = GetConstitutive();
@@ -148,7 +148,7 @@ void PlaneStressShell::Contribute(IntPointData & intpointdata, double weight, Ma
 	EK = EK + ek;
 }
 
-void PlaneStressShell::ContributeError(IntPointData & integrationpointdata, VecDouble & u_exact, Matrix & du_exact, VecDouble & errors) const
+void PlaneStrainShell::ContributeError(IntPointData & integrationpointdata, VecDouble & u_exact, Matrix & du_exact, VecDouble & errors) const
 {
 	VecDouble sol = integrationpointdata.solution;
 	Matrix dsol = integrationpointdata.dsoldx;
@@ -174,7 +174,7 @@ void PlaneStressShell::ContributeError(IntPointData & integrationpointdata, VecD
 	errors[2] = errors[1] + errors[2];
 }
 
-std::vector<double> PlaneStressShell::PostProcessSolution(const IntPointData & integrationpointdata, const int var) const
+std::vector<double> PlaneStrainShell::PostProcessSolution(const IntPointData & integrationpointdata, const int var) const
 {
 	return std::vector<double>();
 }

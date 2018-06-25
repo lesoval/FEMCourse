@@ -64,8 +64,8 @@ void Assemble::Compute(Matrix & globmat, Matrix & rhs)
 	int nEquations = NEquations();
 	
 	globmat.Resize(nEquations, nEquations);
-	rhs.Resize(nEquations, 1);	
-
+	rhs.Resize(nEquations, 1);
+	
 	for (int i = 0; i < nElements; i++)
 	{
 		CompElement *cel = cmesh->GetElement(i);
@@ -90,7 +90,8 @@ void Assemble::Compute(Matrix & globmat, Matrix & rhs)
 
 		for (int j = 0; j < nShapes*nStates; j++)
 		{
-			rhs(firstEq[j], 0) = ef(j, 0);
+			rhs(firstEq[j], 0) += ef(j, 0);
+			
 			for (int k = 0; k < nShapes*nStates; k++)
 			{
 				globmat(firstEq[j], firstEq[k]) += ek(j, k);

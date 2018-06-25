@@ -31,11 +31,11 @@ void IntRuleQuad::SetOrder(int order)
 
 	if (resto != 0)
 	{
-		npoints = (fOrder + 1) / 2;	//para fOrder impar
+		npoints = (fOrder + 1);	//para fOrder impar
 	}
 	if (resto == 0)
 	{
-		npoints = (fOrder + 2) / 2;	//para fOrder par
+		npoints = (fOrder + 2);	//para fOrder par
 	}
 	npoints = pow(npoints, 2);
 

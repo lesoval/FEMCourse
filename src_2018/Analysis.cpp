@@ -9,6 +9,7 @@
 #include "Assemble.h"
 #include "CompMesh.h"
 #include "VTKGeoMesh.h"
+#include <fstream>
 
 Analysis::Analysis()
 {
@@ -51,26 +52,30 @@ CompMesh * Analysis::Mesh() const
 void Analysis::RunSimulation()
 {
 	Assemble assem(cmesh);
-
-	
+	std::cout << "Assemble";
 	assem.Compute(GlobalSystem, RightHandSide);
-	//GlobalSystem.Print(std::cout);
-	//RightHandSide.Print(std::cout);
+	std::cout << " -> done!" << std::endl;
+
+	//std::ofstream out("matrizes.txt");
+	//GlobalSystem.Print(out << std::endl);
+	//RightHandSide.Print(out << std::endl);
 	
+	Matrix EK = GlobalSystem;
 	Solution = RightHandSide;
 
-	std::cout << "Running Simulation..." << std::endl;
-	GlobalSystem.Solve_LU(Solution);
-	//Solution.Print(std::cout);
+	std::cout << "Run Simulation";
+	EK.Solve_LU(Solution);
+	//Solution.Print(out << std::endl);
+
 	VecDouble sol(Solution.Rows());
 	for (int i = 0; i < Solution.Rows(); i++)
 	{
 		sol[i] = Solution(i, 0);
 	}
-
+	
 	cmesh->LoadSolution(sol);
 
-	std::cout << "Simulation Finished" << std::endl;
+	std::cout << " -> done!" << std::endl;
 }
 
 void Analysis::PostProcessSolution(const std::string & filename, PostProcess & defPostProc) const

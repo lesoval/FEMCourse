@@ -119,7 +119,7 @@ void CompElement::ComputeRequiredData(IntPointData &data, VecDouble &intpoint) c
 	geoel->X(intpoint, data.x);
 	geoel->GradX(intpoint, data.x, gradx);
 	geoel->Jacobian(gradx, jac, data.axes, data.detjac, jacinv);
-
+	
 	ShapeFunctions(intpoint, data.phi, data.dphidksi);
 	Convert2Axes(data.dphidksi, jacinv, data.dphidx);
 }
@@ -128,7 +128,7 @@ void CompElement::Convert2Axes(const Matrix & dphi, const Matrix & jacinv, Matri
 {
 	int nShapes = NShapeFunctions();
 	int dim = Dimension();
-
+	
 	for (int i = 0; i < nShapes; i++)
 	{
 		for (int j = 0; j < dim; j++)
@@ -142,10 +142,7 @@ void CompElement::Convert2Axes(const Matrix & dphi, const Matrix & jacinv, Matri
 }
 
 void CompElement::CalcStiff(Matrix &ek, Matrix &ef) const
-{
-	IntPointData data;
-	InitializeIntPointData(data);
-	
+{	
 	int dim = Dimension();
 	int nShapes = NShapeFunctions();
 	int nStates = GetStatement()->NState();
@@ -156,6 +153,9 @@ void CompElement::CalcStiff(Matrix &ek, Matrix &ef) const
 
 	for (int i = 0; i < nIntpoints; i++)
 	{
+		IntPointData data;
+		InitializeIntPointData(data);
+
 		intrule->Point(i, data.ksi, data.weight);
 		ComputeRequiredData(data, data.ksi);
 
@@ -165,6 +165,38 @@ void CompElement::CalcStiff(Matrix &ek, Matrix &ef) const
 
 void CompElement::EvaluateError(std::function<void(const VecDouble&loc, VecDouble&val, Matrix&deriv)> fp, VecDouble & errors) const
 {
+	MathStatement *mat = GetStatement();
+	int nErrors = mat->NEvalErrors();
+	int dim = Dimension();
+	int nStates = GetStatement()->NState();
+	int nIntpoints = intrule->NPoints();
+
+	errors.resize(nErrors);
+	if (fp != NULL)
+	{
+		for (int i = 0; i < nIntpoints; i++)
+		{
+			IntPointData data;
+			InitializeIntPointData(data);
+
+			intrule->Point(i, data.ksi, data.weight);
+			ComputeRequiredData(data, data.ksi);
+			GetMultiplyingCoeficients(data.coefs);
+			data.ComputeSolution();
+
+			VecDouble u_exact;
+			Matrix du_exact;
+			fp(data.x, u_exact, du_exact);
+
+			VecDouble ErrorPoint(nErrors);
+			mat->ContributeError(data, u_exact, du_exact, errors);
+		}
+
+		for (int i = 0; i < nErrors; i++)
+		{
+			errors[i] = sqrt(errors[i]);
+		}
+	}
 }
 
 void CompElement::Solution(VecDouble & intpoint, int var, VecDouble & sol, TMatrix & dsol) const
@@ -177,5 +209,5 @@ void CompElement::Solution(VecDouble & intpoint, int var, VecDouble & sol, TMatr
 	data.ComputeSolution();
 
 	sol = data.solution;
-	dsol = data.dsoldx;
+	dsol = data.dsoldx;	
 }

@@ -280,7 +280,7 @@ void VTKGeoMesh::PrintCMeshVTK(CompMesh *cmesh, int dim, const std::string &file
 			solution << std::endl;
 									
 			for (i = 0; i<dsol.Rows(); i++) {
-				gradsol << dsol(i, 0) << " ";
+				gradsol << dsol(i, i) << " ";
 			}
 			for (; i<3; i++) gradsol << "0 ";
 			gradsol << std::endl;

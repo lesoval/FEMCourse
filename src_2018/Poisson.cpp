@@ -127,6 +127,28 @@ void Poisson::Contribute(IntPointData &integrationpointdata, double weight, Matr
 
 void Poisson::ContributeError(IntPointData & integrationpointdata, VecDouble & u_exact, Matrix & du_exact, VecDouble & errors) const
 {
+	VecDouble sol = integrationpointdata.solution;
+	Matrix dsol = integrationpointdata.dsoldx;
+	double weight = integrationpointdata.weight;
+	double detjac = integrationpointdata.detjac;
+
+	int nStates = NState();
+	int dim = Dimension();
+
+	for (int i = 0; i < nStates; i++)
+	{
+		errors[0] += pow(sol[i] - u_exact[i], 2) * weight*detjac;
+	}
+
+	for (int i = 0; i < nStates; i++)
+	{
+		for (int j = 0; j < dim; j++)
+		{
+			errors[1] += pow(dsol(i, j) - du_exact(i, j), 2)*weight*detjac;
+		}
+	}
+
+	errors[2] = errors[1] + errors[2];
 }
 
 std::vector<double> Poisson::PostProcessSolution(const IntPointData & integrationpointdata, const int var) const

@@ -42,7 +42,7 @@ void ShapeTriangle::Shape(const VecDouble &xi, VecInt &orders, VecDouble &phi, M
 	case 6:
 		phi[0] = -(1 - ksi - eta)*(1 - 2 * (1 - ksi - eta));
 		phi[1] = -ksi * (1 - 2 * ksi);
-		phi[2] = -eta * (1 - 2 * ksi);
+		phi[2] = -eta * (1 - 2 * eta);
 		phi[3] = 4 * ksi*(1 - ksi - eta);
 		phi[4] = 4 * ksi*eta;
 		phi[5] = 4 * eta*(1 - ksi - eta);
