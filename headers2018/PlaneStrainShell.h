@@ -1,19 +1,19 @@
 /*
-*  PlaneStressShell.h
+*  PlaneStrainShell.h
 *
-*  Created by Leandro Valdez on 6/11/18.
+*  Created by Leandro Valdez on 6/24/18.
 *
 */
 
-#ifndef PlaneStressShell_h
-#define PlaneStressShell_h
+#ifndef PlaneStrainShell_h
+#define PlaneStrainShell_h
 
 #include "MathStatement.h"
 #include "DataTypes.h"
 #include "IntPointData.h"
 #include <functional>
 
-class PlaneStressShell : public MathStatement
+class PlaneStrainShell : public MathStatement
 {
 	//Element thickness
 	double t;
@@ -28,23 +28,23 @@ public:
 
 	enum PostProcVar { ENone, ESol, EDSol, ETension, EForce, ESolExact, EDSolExact };
 
-	//Default constructor of PlaneStressShell
-	PlaneStressShell();
+	//Default constructor of PlaneStrainShell
+	PlaneStrainShell();
 
-	//Constructor of PlaneStressShell
-	PlaneStressShell(int materialid, double E, double ni, double thickness);
+	//Constructor of PlaneStrainShell
+	PlaneStrainShell(int materialid, double E, double ni, double thickness);
 
-	//Copy constructor of PlaneStressShell
-	PlaneStressShell(const PlaneStressShell &copy);
+	//Copy constructor of PlaneStrainShell
+	PlaneStrainShell(const PlaneStrainShell &copy);
 
 	//Operator of copy
-	PlaneStressShell &operator=(const PlaneStressShell &copy);
+	PlaneStrainShell &operator=(const PlaneStrainShell &copy);
 
 	// Method for creating a copy of the element
-	virtual PlaneStressShell *Clone() const;
+	virtual PlaneStrainShell *Clone() const;
 
-	//Destructor of PlaneStressShell
-	virtual ~PlaneStressShell();
+	//Destructor of PlaneStrainShell
+	virtual ~PlaneStrainShell();
 
 	//Create constitutive matrix
 	Matrix Constitutive(double E, double ni);
@@ -87,4 +87,4 @@ public:
 	// Prepare and print post processing data
 	virtual std::vector<double> PostProcessSolution(const IntPointData &integrationpointdata, const int var) const;
 };
-#endif /* PlaneStressShell_h */
+#endif /* PlaneStrainShell_h */

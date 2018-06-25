@@ -14,35 +14,35 @@
 class IntPointData
 {
 public:
-
-	VecDouble ksi;
-
-	double weight;
-
-	VecDouble phi;
-
-	Matrix dphidksi;
-
-	VecDouble x;
-
-	Matrix gradx;
-
-	Matrix axes;
-
-	double detjac;
-
-	Matrix dphidx;
-
-	VecDouble solution;
-
-	Matrix dsoldksi;
-
-	Matrix dsoldx;
-
-	VecDouble coefs;
-
-	void ComputeSolution()
-	{
+    
+    VecDouble ksi;
+    
+    double weight;
+    
+    VecDouble phi;
+    
+    Matrix dphidksi;
+    
+    VecDouble x;
+    
+    Matrix gradx;
+    
+    Matrix axes;
+    
+    double detjac;
+    
+    Matrix dphidx;
+    
+    VecDouble solution;
+    
+    Matrix dsoldksi;
+    
+    Matrix dsoldx;
+    
+    VecDouble coefs;
+    
+    void ComputeSolution()
+    {
 		if (coefs.size() % phi.size())
 		{
 			//    DebugStop();
@@ -54,7 +54,7 @@ public:
 		dsoldx.Resize(dphidx.Rows(), nstate);
 		dsoldx.Zero();
 		dsoldksi.Zero();
-				
+
 		int dim = dphidx.Rows();
 
 		Matrix gradphi(dim, phi.size());
@@ -65,11 +65,11 @@ public:
 			{
 				for (int k = 0; k < dim; k++)
 				{
-					gradphi(k, i) += dphidx(j, i)*axes(j, k);
+					gradphi(j, i) += dphidx(k, i)*axes(k, j);
 				}
 			}
 		}
-				
+
 		for (int iphi = 0; iphi<phi.size(); iphi++) {
 			double phival = phi[iphi];
 			for (int istate = 0; istate<nstate; istate++) {
