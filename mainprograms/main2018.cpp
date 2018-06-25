@@ -36,13 +36,13 @@ void main()
 	//TestQuad(2);
 	//TestTriangle(2);
 	//PlaneStressTest("BasicMesh", 2);
-	VasselTest("Vessel", 1);
+	VesselTest("Vessel", 1);
 
 	system("pause");
 }
 
 //Pressure vessel - Plane Strain
-void VasselTest(const std::string Malha, const int order)
+void VesselTest(const std::string Malha, const int order)
 {
 	GeoMesh gmesh;
 	
