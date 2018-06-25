@@ -29,7 +29,7 @@
 void TestQuad(const int order);
 void TestTriangle(const int order);
 void PlaneStressTest(const std::string Malha, const int order);
-void VasselTest(const std::string Malha, const int order);
+void VesselTest(const std::string Malha, const int order);
 
 void main()
 {
