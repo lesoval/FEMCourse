@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include "Shape1d.h"
 #include "ShapeQuad.h"
@@ -25,6 +26,8 @@
 #include "PlaneStrainShell.h"
 #include "OnlyForce.h"
 #include "Restrain.h"
+#include "PostProcess.h"
+#include "PostProcessTemplate.h"
 
 void TestQuad(const int order);
 void TestTriangle(const int order);
@@ -36,7 +39,7 @@ void main()
 	//TestQuad(2);
 	//TestTriangle(2);
 	//PlaneStressTest("BasicMesh", 2);
-	VesselTest("Vessel", 1);
+	VesselTest("Vessel", 2);
 
 	system("pause");
 }
@@ -50,10 +53,33 @@ void VesselTest(const std::string Malha, const int order)
 	teste->Read(gmesh, Malha + ".msh");
 	gmesh.BuildConnectivity();
 	//gmesh.Print(std::cout);
-	VTKGeoMesh::PrintGMeshVTK(&gmesh, "G" + Malha + ".vtk");
+	//VTKGeoMesh::PrintGMeshVTK(&gmesh, "G" + Malha + ".vtk");
 
-	PlaneStrainShell *Elasticity = new PlaneStrainShell(1, 2.1e5, 0.3, 1);
-	OnlyForce *Force1 = new OnlyForce(2);
+	double E = 2.1e5; double ni = 0.3; double t = 1;
+	PlaneStressShell *Elasticity = new PlaneStressShell(1, E, ni, t); Elasticity->SetDimension(2);
+	auto u_exact = [](const VecDouble &x, VecDouble &u, Matrix &du)
+	{
+		double E = 2.1e5; double ni = 0.3; double t = 1;
+		double a = 30; double b = 40; double pi = 100; double p0 = 75;
+		double r = sqrt(x[0] * x[0] + x[1] * x[1]);
+
+		double ur = ((a*a*pi - b * b*p0)*(1 - ni)*r - (a*a*b*b*(p0 - pi)*(1 + ni)) / r) / (E*(b*b - a * a));
+		u.resize(2);
+		u[0] = ur * x[0] / r;
+		u[1] = ur * x[1] / r;
+
+		double sigmar = (a*a*pi - b * b*p0) / (b*b - a * a) + (a*a*b*b*(p0 - pi)) / (b*b - a * a) / (r*r);
+		double sigmat = (a*a*pi - b * b*p0) / (b*b - a * a) - (a*a*b*b*(p0 - pi)) / (b*b - a * a) / (r*r);
+
+		double dur = (sigmar - ni * sigmat) / E; double dut = (sigmat - ni * sigmar) / E;
+		du.Resize(3, 1);
+		du(0, 0) = dur * pow(x[0] / r, 2) + dut * pow(x[1] / r, 2);
+		du(1, 0) = dur * pow(x[1] / r, 2) + dut * pow(x[0] / r, 2);
+		du(2, 0) = (du(0, 0) - du(1, 0))*tan(2 * atan(x[1] / x[0]));
+	};
+	Elasticity->SetExactSolution(u_exact);
+
+	OnlyForce *Force1 = new OnlyForce(2); Force1->SetDimension(2);
 	auto carga1 = [](const VecDouble &x, VecDouble &f)
 	{
 		double hip = sqrt(x[0] * x[0] + x[1] * x[1]);
@@ -63,7 +89,7 @@ void VesselTest(const std::string Malha, const int order)
 	};
 	Force1->SetForceFunction(carga1);
 
-	OnlyForce *Force2 = new OnlyForce(3);
+	OnlyForce *Force2 = new OnlyForce(3); Force2->SetDimension(2);
 	auto carga2 = [](const VecDouble &x, VecDouble &f)
 	{
 		double hip = sqrt(x[0] * x[0] + x[1] * x[1]);
@@ -72,7 +98,7 @@ void VesselTest(const std::string Malha, const int order)
 		f[1] = -75 * x[1] / hip;
 	};
 	Force2->SetForceFunction(carga2);
-	//Restrain *Rest = new Restrain(3);
+	//Restrain *Rest = new Restrain(4); Rest->SetDimension(2);
 
 	CompMesh cmesh(&gmesh); cmesh.SetDefaultOrder(order); cmesh.SetNumberMath(3);
 	cmesh.SetMathStatement(1, Elasticity);
@@ -83,7 +109,20 @@ void VesselTest(const std::string Malha, const int order)
 	Analysis an(&cmesh);
 	an.RunSimulation();
 
-	VTKGeoMesh::PrintCMeshVTK(&cmesh, 2, "C" + Malha + ".vtk");
+	//VTKGeoMesh::PrintCMeshVTK(&cmesh, 2, "C" + Malha + ".vtk");
+
+	PostProcess *sol = new PostProcessTemplate<PlaneStrainShell>(&an);
+	sol->AppendVariable("Displacement");
+	sol->AppendVariable("Strain");
+	sol->AppendVariable("Tension");
+	sol->AppendVariable("SolExact");
+	sol->AppendVariable("DSolExact");
+
+	an.PostProcessSolution(Malha, *sol);
+
+	sol->SetExact(u_exact);
+	std::ofstream out("Errors.txt");
+	VecDouble error = an.PostProcessError(out, *sol);
 }
 
 //PlaneStressShell Test
@@ -95,11 +134,11 @@ void PlaneStressTest(const std::string Malha, const int order)
 	teste->Read(gmesh, Malha + ".msh");
 	gmesh.BuildConnectivity();
 	//gmesh.Print(std::cout);
-	VTKGeoMesh::PrintGMeshVTK(&gmesh, "G" + Malha + ".vtk");
+	//VTKGeoMesh::PrintGMeshVTK(&gmesh, "G" + Malha + ".vtk");
 
-	PlaneStressShell *Elasticity = new PlaneStressShell(1, 2.1e8, 0.3, 0.025);
-	Restrain *Rest = new Restrain(2);
-	OnlyForce *Force = new OnlyForce(3);
+	PlaneStressShell *Elasticity = new PlaneStressShell(1, 2.1e8, 0.3, 0.025); Elasticity->SetDimension(2);
+	Restrain *Rest = new Restrain(2); Rest->SetDimension(2);
+	OnlyForce *Force = new OnlyForce(3); Force->SetDimension(2);
 	auto carga = [](const VecDouble &x, VecDouble &f)
 	{
 		f[0] = 0;
@@ -116,7 +155,14 @@ void PlaneStressTest(const std::string Malha, const int order)
 	Analysis an(&cmesh);
 	an.RunSimulation();
 
-	VTKGeoMesh::PrintCMeshVTK(&cmesh, 2, "C" + Malha + ".vtk");
+	//VTKGeoMesh::PrintCMeshVTK(&cmesh, 2, "C" + Malha + ".vtk");
+
+	PostProcess *sol = new PostProcessTemplate<PlaneStrainShell>(&an);
+	sol->AppendVariable("Displacement");
+	sol->AppendVariable("Strain");
+	sol->AppendVariable("Tension");
+
+	an.PostProcessSolution(Malha, *sol);
 }
 
 //Plane Stress Test Triangle - Mixed boundary
@@ -146,17 +192,17 @@ void TestTriangle(const int order)
 	gmesh.BuildConnectivity();
 
 	//gmesh.Print(std::cout);
-	VTKGeoMesh::PrintGMeshVTK(&gmesh, "GTestTriangle.vtk");
+	//VTKGeoMesh::PrintGMeshVTK(&gmesh, "GTestTriangle.vtk");
 
-	PlaneStressShell *Elasticity = new PlaneStressShell(1, 2.1e8, 0.3, 0.025);
-	OnlyForce *Force = new OnlyForce(2);
+	PlaneStressShell *Elasticity = new PlaneStressShell(1, 2.1e8, 0.3, 0.025); Elasticity->SetDimension(2);
+	OnlyForce *Force = new OnlyForce(2); Force->SetDimension(2);
 	auto carga = [](const VecDouble &x, VecDouble &f)
 	{
 		f[0] = 75;
 		f[1] = 0;
 	};
 	Force->SetForceFunction(carga);
-	Restrain *Rest = new Restrain(3);
+	Restrain *Rest = new Restrain(3); Rest->SetDimension(2);
 
 	CompMesh cmesh(&gmesh); cmesh.SetDefaultOrder(order); cmesh.SetNumberMath(3);
 	cmesh.SetMathStatement(1, Elasticity);
@@ -167,7 +213,14 @@ void TestTriangle(const int order)
 	Analysis an(&cmesh);
 	an.RunSimulation();
 
-	VTKGeoMesh::PrintCMeshVTK(&cmesh, 2, "CTestTriangle.vtk");
+	//VTKGeoMesh::PrintCMeshVTK(&cmesh, 2, "CTestTriangle.vtk");
+
+	PostProcess *sol = new PostProcessTemplate<PlaneStrainShell>(&an);
+	sol->AppendVariable("Displacement");
+	sol->AppendVariable("Strain");
+	sol->AppendVariable("Tension");
+
+	an.PostProcessSolution("TestTriangle", *sol);
 }
 
 //Plane Stress Test Quad - Mixed boundary
@@ -201,17 +254,17 @@ void TestQuad(const int order)
 	gmesh.BuildConnectivity();
 
 	//gmesh.Print(std::cout);
-	VTKGeoMesh::PrintGMeshVTK(&gmesh, "GTestQuad.vtk");
+	//VTKGeoMesh::PrintGMeshVTK(&gmesh, "GTestQuad.vtk");
 
-	PlaneStressShell *Elasticity = new PlaneStressShell(1, 2.1e8, 0.3, 0.025);
-	OnlyForce *Force = new OnlyForce(2);
+	PlaneStressShell *Elasticity = new PlaneStressShell(1, 2.1e8, 0.3, 0.025); Elasticity->SetDimension(2);
+	OnlyForce *Force = new OnlyForce(2); Force->SetDimension(2);
 	auto carga = [](const VecDouble &x, VecDouble &f)
 	{
 		f[0] = 75;
 		f[1] = 0;
 	};
 	Force->SetForceFunction(carga);
-	Restrain *Rest = new Restrain(3);
+	Restrain *Rest = new Restrain(3); Rest->SetDimension(2);
 
 	CompMesh cmesh(&gmesh); cmesh.SetDefaultOrder(order); cmesh.SetNumberMath(3);
 	cmesh.SetMathStatement(1, Elasticity);
@@ -222,5 +275,12 @@ void TestQuad(const int order)
 	Analysis an(&cmesh);
 	an.RunSimulation();
 
-	VTKGeoMesh::PrintCMeshVTK(&cmesh, 2, "CTestQuad.vtk");
+	//VTKGeoMesh::PrintCMeshVTK(&cmesh, 2, "CTestQuad.vtk");
+
+	PostProcess *sol = new PostProcessTemplate<PlaneStrainShell>(&an);
+	sol->AppendVariable("Displacement");
+	sol->AppendVariable("Strain");
+	sol->AppendVariable("Tension");
+
+	an.PostProcessSolution("TestQuad", *sol);
 }
