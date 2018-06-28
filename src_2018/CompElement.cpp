@@ -96,7 +96,7 @@ void CompElement::InitializeIntPointData(IntPointData &data) const
 	data.weight = 0;
 	data.detjac = 0;
 
-	data.axes.Resize(dim, dim);
+	data.axes.Resize(dim, 3);
 	data.x.resize(3);
 	data.ksi.resize(dim);
 
@@ -169,6 +169,7 @@ void CompElement::EvaluateError(std::function<void(const VecDouble&loc, VecDoubl
 	int nErrors = mat->NEvalErrors();
 	int dim = Dimension();
 	int nStates = GetStatement()->NState();
+	GetIntRule()->SetOrder(10);
 	int nIntpoints = intrule->NPoints();
 
 	errors.resize(nErrors);
@@ -191,15 +192,10 @@ void CompElement::EvaluateError(std::function<void(const VecDouble&loc, VecDoubl
 			VecDouble ErrorPoint(nErrors);
 			mat->ContributeError(data, u_exact, du_exact, errors);
 		}
-
-		for (int i = 0; i < nErrors; i++)
-		{
-			errors[i] = sqrt(errors[i]);
-		}
 	}
 }
 
-void CompElement::Solution(VecDouble & intpoint, int var, VecDouble & sol, TMatrix & dsol) const
+void CompElement::Solution(VecDouble & intpoint, int var, VecDouble & sol) const
 {
 	IntPointData data;
 	InitializeIntPointData(data);
@@ -208,6 +204,5 @@ void CompElement::Solution(VecDouble & intpoint, int var, VecDouble & sol, TMatr
 
 	data.ComputeSolution();
 
-	sol = data.solution;
-	dsol = data.dsoldx;	
+	GetStatement()->PostProcessSolution(data, var, sol);
 }

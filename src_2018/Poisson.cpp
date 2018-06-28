@@ -50,11 +50,6 @@ int Poisson::NEvalErrors() const
 	return 0;
 }
 
-int Poisson::NState() const
-{
-	return 2;
-}
-
 int Poisson::VariableIndex(const PostProcVar var) const
 {
 	return 0;
@@ -151,9 +146,8 @@ void Poisson::ContributeError(IntPointData & integrationpointdata, VecDouble & u
 	errors[2] = errors[1] + errors[2];
 }
 
-std::vector<double> Poisson::PostProcessSolution(const IntPointData & integrationpointdata, const int var) const
+void Poisson::PostProcessSolution(const IntPointData & integrationpointdata, const int var, VecDouble & sol) const
 {
-	return std::vector<double>();
 }
 
 double Poisson::Inner(Matrix & S, Matrix & T) const

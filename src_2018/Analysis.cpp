@@ -8,6 +8,8 @@
 #include "Analysis.h"
 #include "Assemble.h"
 #include "CompMesh.h"
+#include "CompElement.h"
+#include "MathStatement.h"
 #include "VTKGeoMesh.h"
 #include <fstream>
 
@@ -67,12 +69,7 @@ void Analysis::RunSimulation()
 	EK.Solve_LU(Solution);
 	//Solution.Print(out << std::endl);
 
-	VecDouble sol(Solution.Rows());
-	for (int i = 0; i < Solution.Rows(); i++)
-	{
-		sol[i] = Solution(i, 0);
-	}
-	
+	VecDouble sol = Solution.GetCol(0);
 	cmesh->LoadSolution(sol);
 
 	std::cout << " -> done!" << std::endl;
@@ -80,9 +77,36 @@ void Analysis::RunSimulation()
 
 void Analysis::PostProcessSolution(const std::string & filename, PostProcess & defPostProc) const
 {
+	VTKGeoMesh::PrintSolVTK(cmesh, defPostProc, "S" + filename + ".vtk");
 }
 
 VecDouble Analysis::PostProcessError(std::ostream & out, PostProcess & defPostProc) const
 {
-	return VecDouble();
+	VecDouble tError(3);
+	int nElements = cmesh->GetElementVec().size();
+
+	for (int i = 0; i < nElements; i++)
+	{
+		CompElement *cel = cmesh->GetElement(i);
+		int nErrors = cel->GetStatement()->NEvalErrors();
+
+		VecDouble errors(nErrors);
+		cel->EvaluateError(defPostProc.GetExact(), errors);
+
+		for (int j = 0; j < nErrors; j++)
+		{
+			tError[j] += errors[j];
+		}
+	}
+
+	for (int i = 0; i < tError.size(); i++)
+	{
+		tError[i] = sqrt(tError[i]);
+	}
+
+	out << "Error -> u = " << tError[0] << std::endl;
+	out << "Error -> Grad u = " << tError[1] << std::endl;
+	out << "Error -> u + Grad u = " << tError[2] << std::endl;
+
+	return tError;
 }

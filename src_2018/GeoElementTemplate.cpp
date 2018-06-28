@@ -221,6 +221,12 @@ void GeoElementTemplate<TGeom>::Jacobian(const Matrix &gradx, Matrix &jac, Matri
 }
 
 template<class TGeom>
+int GeoElementTemplate<TGeom>::SideIsUndefined(int side)
+{
+	return 0;
+}
+
+template<class TGeom>
 int GeoElementTemplate<TGeom>::WhichSide(VecInt & SideNodeIds)
 {
 	int size = SideNodeIds.size();

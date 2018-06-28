@@ -19,7 +19,6 @@ MathStatement::MathStatement(const MathStatement &copy)
 MathStatement &MathStatement::operator=(const MathStatement &copy)
 {
 	matid = copy.matid;
-	nstate = copy.nstate;
 
 	return *this;
 }
@@ -28,7 +27,7 @@ MathStatement::~MathStatement() {}
 
 void MathStatement::Axes2XYZ(const Matrix & dudaxes, Matrix & dudx, const Matrix & axesv, bool colMajor) const
 {
-	int dim = dudaxes.Rows();
+	int dim = Dimension();
 	int nShapes = dudaxes.Cols();
 	dudx.Resize(dim, nShapes);
 	
@@ -36,10 +35,14 @@ void MathStatement::Axes2XYZ(const Matrix & dudaxes, Matrix & dudx, const Matrix
 	{
 		for (int j = 0; j < dim; j++)
 		{
-			for (int k = 0; k < dim; k++)
+			for (int k = 0; k < dudaxes.Rows(); k++)
 			{
 				dudx(j, i) += dudaxes.GetVal(k, i)*axesv.GetVal(k, j);
 			}
 		}
 	}
+}
+
+void MathStatement::Print(std::ostream & out)
+{
 }

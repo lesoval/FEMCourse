@@ -59,7 +59,7 @@ void IntRule::Point(int p, VecDouble &co, double &weight) const
 	
 }
 
-void IntRule::Print(std::ostream &out) const
+void IntRule::Print(std::ostream &out)
 {
 	out << "ORDER	" << fOrder << "	NPoints	" << NPoints() << "\n" << std::endl;
 

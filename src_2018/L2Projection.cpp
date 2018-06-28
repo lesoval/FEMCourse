@@ -48,11 +48,6 @@ int L2Projection::NEvalErrors() const
 	return 0;
 }
 
-int L2Projection::NState() const
-{
-	return 1;
-}
-
 int L2Projection::VariableIndex(const PostProcVar var) const
 {
 	return 0;
@@ -76,7 +71,6 @@ void L2Projection::ContributeError(IntPointData & integrationpointdata, VecDoubl
 {
 }
 
-std::vector<double> L2Projection::PostProcessSolution(const IntPointData & integrationpointdata, const int var) const
+void L2Projection::PostProcessSolution(const IntPointData & integrationpointdata, const int var, VecDouble & sol) const
 {
-	return std::vector<double>();
 }

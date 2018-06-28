@@ -47,12 +47,74 @@ int Restrain::NState() const
 	return 2;
 }
 
+int Restrain::VariableIndex(const PostProcVar var) const
+{
+	switch (var)
+	{
+	case ESol:
+		return 1;
+	case EDSol:
+		return 2;
+	case EFlux:
+		return 3;
+	case EForce:
+		return 4;
+	case ESolExact:
+		return 5;
+	case EDSolExact:
+		return 6;
+	default:
+		std::cout << " Variable not implemented " << std::endl;
+		DebugStop();
+		break;
+	}
+}
+
+Restrain::PostProcVar Restrain::VariableIndex(const std::string & name)
+{
+	if (!strcmp("Displacement", name.c_str()))	return ESol;
+	if (!strcmp("Strain", name.c_str()))		return EDSol;
+	if (!strcmp("Tension", name.c_str()))		return EFlux;
+	if (!strcmp("Force", name.c_str()))			return EForce;
+	if (!strcmp("SolExact", name.c_str()))		return ESolExact;
+	if (!strcmp("DSolExact", name.c_str()))		return EDSolExact;
+	else
+	{
+		std::cout << " Variable not implemented " << std::endl;
+		DebugStop();
+		return ENone;
+	}
+}
+
+int Restrain::NSolutionVariables(const PostProcVar var)
+{
+	switch (var)
+	{
+	case ESol:
+		return NState();
+	case EDSol:
+		return 3;
+	case EFlux:
+		return 3;
+	case EForce:
+		return NState();
+	case ESolExact:
+		return NState();
+	case EDSolExact:
+		return 3;
+	default:
+		std::cout << " Variable not implemented " << std::endl;
+		DebugStop();
+		break;
+	}
+}
+
 void Restrain::Contribute(IntPointData & intpointdata, double weight, Matrix & EK, Matrix & EF) const
 {
 	VecDouble &phi = intpointdata.phi;
 	VecDouble  &x = intpointdata.x;
 	double detjac = intpointdata.detjac;
-
+	
 	int nStates = NState();
 	int nShapes = intpointdata.phi.size();
 
@@ -69,7 +131,6 @@ void Restrain::ContributeError(IntPointData & integrationpointdata, VecDouble & 
 {
 }
 
-std::vector<double> Restrain::PostProcessSolution(const IntPointData & integrationpointdata, const int var) const
+void Restrain::PostProcessSolution(const IntPointData & integrationpointdata, const int var, VecDouble & sol) const
 {
-	return std::vector<double>();
 }

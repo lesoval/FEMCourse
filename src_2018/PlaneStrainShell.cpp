@@ -27,17 +27,18 @@ PlaneStrainShell & PlaneStrainShell::operator=(const PlaneStrainShell & copy)
 {
 	cMat = copy.cMat;
 	forceFunction = copy.forceFunction;
+	SolutionExact = copy.SolutionExact;
 
 	return *this;
+}
+
+PlaneStrainShell::~PlaneStrainShell()
+{
 }
 
 PlaneStrainShell * PlaneStrainShell::Clone() const
 {
 	return new PlaneStrainShell(*this);
-}
-
-PlaneStrainShell::~PlaneStrainShell()
-{
 }
 
 Matrix PlaneStrainShell::Constitutive(double E, double ni)
@@ -75,9 +76,43 @@ int PlaneStrainShell::NState() const
 	return 2;
 }
 
-int PlaneStrainShell::VariableIndex(const std::string & name)
+int PlaneStrainShell::VariableIndex(const PostProcVar var) const
 {
-	return 0;
+	switch (var)
+	{
+	case ESol:
+		return 1;
+	case EDSol:
+		return 2;
+	case EFlux:
+		return 3;
+	case EForce:
+		return 4;
+	case ESolExact:
+		return 5;
+	case EDSolExact:
+		return 6;
+	default:
+		std::cout << " Variable not implemented " << std::endl;
+		DebugStop();
+		break;
+	}
+}
+
+PlaneStrainShell::PostProcVar PlaneStrainShell::VariableIndex(const std::string & name)
+{
+	if (!strcmp("Displacement", name.c_str()))	return ESol;
+	if (!strcmp("Strain", name.c_str()))		return EDSol;
+	if (!strcmp("Tension", name.c_str()))		return EFlux;
+	if (!strcmp("Force", name.c_str()))			return EForce;
+	if (!strcmp("SolExact", name.c_str()))		return ESolExact;
+	if (!strcmp("DSolExact", name.c_str()))		return EDSolExact;
+	else
+	{
+		std::cout << " Variable not implemented " << std::endl;
+		DebugStop();
+		return ENone;
+	}
 }
 
 int PlaneStrainShell::NSolutionVariables(const PostProcVar var)
@@ -87,15 +122,15 @@ int PlaneStrainShell::NSolutionVariables(const PostProcVar var)
 	case ESol:
 		return NState();
 	case EDSol:
-		return Dimension()*NState();
-	case ETension:
-		return Dimension()*NState();
+		return 3;
+	case EFlux:
+		return 3;
 	case EForce:
 		return NState();
 	case ESolExact:
 		return NState();
 	case EDSolExact:
-		return Dimension()*NState();
+		return 3;
 	default:
 		std::cout << " Variable not implemented " << std::endl;
 		DebugStop();
@@ -151,12 +186,16 @@ void PlaneStrainShell::Contribute(IntPointData & intpointdata, double weight, Ma
 void PlaneStrainShell::ContributeError(IntPointData & integrationpointdata, VecDouble & u_exact, Matrix & du_exact, VecDouble & errors) const
 {
 	VecDouble sol = integrationpointdata.solution;
-	Matrix dsol = integrationpointdata.dsoldx;
+	Matrix dsoldx = integrationpointdata.dsoldx;
+	Matrix axes = integrationpointdata.axes;
 	double weight = integrationpointdata.weight;
 	double detjac = integrationpointdata.detjac;
 
 	int nStates = NState();
 	int dim = Dimension();
+
+	Matrix dsol;
+	Axes2XYZ(dsoldx, dsol, axes);
 
 	for (int i = 0; i < nStates; i++)
 	{
@@ -167,14 +206,81 @@ void PlaneStrainShell::ContributeError(IntPointData & integrationpointdata, VecD
 	{
 		for (int j = 0; j < dim; j++)
 		{
-			errors[1] += pow(dsol(i, j) - du_exact(i, j), 2)*weight*detjac;
+			errors[1] += pow(dsol(i, i) - du_exact(i, 0), 2)*weight*detjac;
 		}
 	}
 
-	errors[2] = errors[1] + errors[2];
+	errors[2] = errors[0] + errors[1];
 }
 
-std::vector<double> PlaneStrainShell::PostProcessSolution(const IntPointData & integrationpointdata, const int var) const
+void PlaneStrainShell::PostProcessSolution(const IntPointData & integrationpointdata, const int var, VecDouble & sol) const
 {
-	return std::vector<double>();
+	PostProcVar Var = PostProcVar(var);
+	VecDouble  x = integrationpointdata.x;
+	VecDouble solution = integrationpointdata.solution;
+	Matrix dsoldx = integrationpointdata.dsoldx;
+	Matrix axes = integrationpointdata.axes;
+
+	Matrix gradsol;
+	Axes2XYZ(dsoldx, gradsol, axes);
+
+	switch (Var)
+	{
+	case PlaneStrainShell::ESol:
+		sol = solution;
+		break;
+	case PlaneStrainShell::EDSol:
+	{
+		sol.resize(3);
+
+		sol[0] = gradsol(0, 0);
+		sol[1] = gradsol(1, 1);
+		sol[2] = gradsol(0, 1) + gradsol(1, 0);
+	}
+	break;
+	case PlaneStrainShell::EFlux:
+	{
+		VecDouble dsol(3);
+		Matrix C = GetConstitutive();
+
+		dsol[0] = gradsol(0, 0);
+		dsol[1] = gradsol(1, 1);
+		dsol[2] = gradsol(0, 1) + gradsol(1, 0);
+
+		sol = C * dsol;
+	}
+	break;
+	case PlaneStrainShell::EForce:
+		if (forceFunction != NULL)
+		{
+			VecDouble force(NState());
+			forceFunction(x, force);
+			force.push_back(0);
+
+			sol = force;
+		}
+		break;
+	case PlaneStrainShell::ESolExact:
+	{
+		VecDouble sol_exact;
+		Matrix dsol_exact;
+		SolutionExact(x, sol_exact, dsol_exact);
+
+		sol = sol_exact;
+	}
+		break;
+	case PlaneStrainShell::EDSolExact:
+	{
+		VecDouble sol_exact;
+		Matrix dsol_exact;
+		SolutionExact(x, sol_exact, dsol_exact);
+
+		sol = dsol_exact.GetCol(0);
+	}
+		break;
+	default:
+		std::cout << " Variable index not implemented " << std::endl;
+		DebugStop();
+		break;
+	}
 }

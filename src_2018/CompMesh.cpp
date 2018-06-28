@@ -203,3 +203,7 @@ void CompMesh::LoadSolution(std::vector<double>& Sol)
 {
 	solution = Sol;
 }
+
+void CompMesh::Print(std::ostream & out)
+{
+}
