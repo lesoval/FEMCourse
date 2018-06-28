@@ -15,6 +15,7 @@
 
 class Poisson : public MathStatement
 {
+
     // Permeability matrix
     Matrix permeability;
     
@@ -69,13 +70,13 @@ public:
         SolutionExact = Exact;
     }
     
-    // returns the integrable dimension of the material
-    int Dimension() const {return 2;}
+    // Return the number of state variables
+    virtual int NState() const {
+        return 2;
+    };
     
     virtual int NEvalErrors() const;
     
-    // Return the number of state variables
-    virtual int NState() const;
     
     virtual int VariableIndex(const PostProcVar var) const;
     
@@ -93,7 +94,7 @@ public:
     virtual void ContributeError(IntPointData &integrationpointdata, VecDouble &u_exact, Matrix &du_exact, VecDouble &errors) const;
     
     // Prepare and print post processing data
-    virtual std::vector<double> PostProcessSolution(const IntPointData &integrationpointdata, const int var) const;
+    virtual void PostProcessSolution(const IntPointData &integrationpointdata, const int var, VecDouble &sol) const;
 
     virtual double Inner(Matrix &S,Matrix &T) const;
     

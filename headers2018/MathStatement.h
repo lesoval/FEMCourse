@@ -14,11 +14,11 @@
 
 class MathStatement
 {
+    
+    int MathDim;
+    
     // Math statement ID
     int matid = 0;
-    
-    // Number of state variable
-    int nstate = 0;
     
 public:
     
@@ -42,7 +42,7 @@ public:
     virtual MathStatement *Clone() const = 0;
     
     // Return the number of state variables
-    virtual int NState() const = 0;
+    virtual int NState() const =0;
     
     // Return the number of errors
     virtual int NEvalErrors() const = 0;
@@ -60,12 +60,23 @@ public:
     virtual int GetMatID(){
         return matid;
     }
+
+    virtual void SetDimension(int dim){
+        MathDim = dim;
+    };
+    
+    virtual int Dimension() const{
+        return MathDim;
+    };
     
     // Prepare and print post processing data
-    virtual std::vector<double> PostProcessSolution(const IntPointData &integrationpointdata, const int var) const = 0;
+    virtual void PostProcessSolution(const IntPointData &integrationpointdata, const int var, VecDouble &sol) const = 0;
     
     
     virtual void Axes2XYZ(const Matrix &dudaxes, Matrix &dudx, const Matrix &axesv, bool colMajor = true) const;
+    
+    //Method to print MathStatement
+    virtual void Print(std::ostream &out);
     
     
 };

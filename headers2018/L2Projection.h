@@ -23,6 +23,7 @@ class L2Projection : public MathStatement
     
     // First value of boundary condition
     Matrix BCVal1;
+    
     // Second value of boundary condition
     Matrix BCVal2;
     
@@ -91,11 +92,13 @@ public:
         SolutionExact = Exact;
     }
     
+    // Return the number of state variables
+    virtual int NState() const {
+        return 2;
+    };
+    
     // Return the number of errors
     virtual int NEvalErrors() const;
-    
-    // Return the number of state variables
-    virtual int NState() const;
     
     virtual int VariableIndex(const PostProcVar var) const;
     
@@ -112,7 +115,7 @@ public:
     virtual void ContributeError(IntPointData &integrationpointdata, VecDouble &u_exact, Matrix &du_exact, VecDouble &errors) const;
     
     // Prepare and print post processing data
-    virtual std::vector<double> PostProcessSolution(const IntPointData &integrationpointdata, const int var) const;
+    virtual void PostProcessSolution(const IntPointData &integrationpointdata, const int var, VecDouble &sol) const;
     
     
 };
