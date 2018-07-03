@@ -92,6 +92,10 @@ int PlaneStrainShell::VariableIndex(const PostProcVar var) const
 		return 5;
 	case EDSolExact:
 		return 6;
+	case EError:
+		return 7;
+	case EDError:
+		return 8;
 	default:
 		std::cout << " Variable not implemented " << std::endl;
 		DebugStop();
@@ -107,6 +111,8 @@ PlaneStrainShell::PostProcVar PlaneStrainShell::VariableIndex(const std::string 
 	if (!strcmp("Force", name.c_str()))			return EForce;
 	if (!strcmp("SolExact", name.c_str()))		return ESolExact;
 	if (!strcmp("DSolExact", name.c_str()))		return EDSolExact;
+	if (!strcmp("Error", name.c_str()))			return EError;
+	if (!strcmp("DError", name.c_str()))		return EDError;
 	else
 	{
 		std::cout << " Variable not implemented " << std::endl;
@@ -130,6 +136,10 @@ int PlaneStrainShell::NSolutionVariables(const PostProcVar var)
 	case ESolExact:
 		return NState();
 	case EDSolExact:
+		return 3;
+	case EError:
+		return 3;
+	case EDError:
 		return 3;
 	default:
 		std::cout << " Variable not implemented " << std::endl;
@@ -278,6 +288,38 @@ void PlaneStrainShell::PostProcessSolution(const IntPointData & integrationpoint
 		sol = dsol_exact.GetCol(0);
 	}
 		break;
+	case PlaneStrainShell::EError:
+	{
+		VecDouble sol_exact;
+		Matrix dsol_exact;
+		SolutionExact(x, sol_exact, dsol_exact);
+
+		sol.resize(3);
+
+		for (int i = 0; i < 2; i++)
+		{
+			sol[i] = abs(sol_exact[i] - solution[i]);
+		}
+	}
+	break;
+	case PlaneStrainShell::EDError:
+	{
+		VecDouble sol_exact;
+		Matrix dsol_exact;
+		SolutionExact(x, sol_exact, dsol_exact);
+
+		sol.resize(3);
+		VecDouble dsol(3);
+		dsol[0] = gradsol(0, 0);
+		dsol[1] = gradsol(1, 1);
+		dsol[2] = gradsol(0, 1) + gradsol(1, 0);
+
+		for (int i = 0; i < 3; i++)
+		{
+			sol[i] = abs(dsol_exact.GetCol(0)[i] - dsol[i]);
+		}
+	}
+	break;
 	default:
 		std::cout << " Variable index not implemented " << std::endl;
 		DebugStop();

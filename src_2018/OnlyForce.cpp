@@ -78,6 +78,8 @@ OnlyForce::PostProcVar OnlyForce::VariableIndex(const std::string & name)
 	if (!strcmp("Force", name.c_str()))			return EForce;
 	if (!strcmp("SolExact", name.c_str()))		return ESolExact;
 	if (!strcmp("DSolExact", name.c_str()))		return EDSolExact;
+	if (!strcmp("Error", name.c_str()))			return EError;
+	if (!strcmp("DError", name.c_str()))		return EDError;
 	else
 	{
 		std::cout << " Variable not implemented " << std::endl;
@@ -91,17 +93,21 @@ int OnlyForce::NSolutionVariables(const PostProcVar var)
 	switch (var)
 	{
 	case ESol:
-		return NState();
+		return 1;
 	case EDSol:
-		return 3;
+		return 2;
 	case EFlux:
 		return 3;
 	case EForce:
-		return NState();
+		return 4;
 	case ESolExact:
-		return NState();
+		return 5;
 	case EDSolExact:
-		return 3;
+		return 6;
+	case EError:
+		return 7;
+	case EDError:
+		return 8;
 	default:
 		std::cout << " Variable not implemented " << std::endl;
 		DebugStop();

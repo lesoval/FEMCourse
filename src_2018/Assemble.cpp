@@ -74,7 +74,7 @@ void Assemble::Compute(Matrix & globmat, Matrix & rhs)
 
 		Matrix ek, ef;
 		cel->CalcStiff(ek, ef);
-		
+		//ek.Print(std::cout << std::endl);
 		VecInt firstEq(nShapes*nStates);
 
 		for (int j = 0; j < nShapes; j++)

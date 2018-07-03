@@ -476,24 +476,31 @@ void VTKGeoMesh::PrintSolVTK(CompMesh *cmesh, PostProcess &defPostProc, const st
 				
 				if (eldim != matdim)
 				{
+					GeoElementSide neigh = cel->GetGeoElement()->Neighbour(2);
+					GeoElement *neighgel = neigh.Element();
+
+					while (neighgel->GetReference()->Dimension() != matdim)
+					{
+						neigh = neigh.Neighbour();
+						neighgel = neigh.Element();
+					}
+					gel = neighgel;
+
+					VecDouble sides(nNodes);
+					int side = neigh.Side();
+
+					sides[0] = neighgel->SideNodeIndex(side, 0);
+					sides[1] = side;
+					sides[2] = neighgel->SideNodeIndex(side, 1);
+
 					Matrix co(nNodes, matdim);
+
 					for (int i = 0; i < nNodes; i++)
 					{
-						GeoElementSide neigh = cel->GetGeoElement()->Neighbour(2);
-						GeoElement *neighgel = neigh.Element();
-
-						while (neighgel->GetReference()->Dimension() != matdim)
-						{
-							neigh = neigh.Neighbour();
-							neighgel = neigh.Element();
-						}
-
-						int side = neigh.Side();
 						for (int j = 0; j < matdim; j++)
 						{
-							co(i, j) = NodeCoordinates(neighgel->Type())(side, j);
+							co(i, j) = NodeCoordinates(neighgel->Type())(sides[i], j);
 						}
-						gel = neighgel;
 					}
 					ParamCo = co;
 					cel = gel->GetReference();

@@ -47,9 +47,9 @@ void ShapeQuad::Shape(const VecDouble &xi, VecInt &orders, VecDouble &phi, Matri
 		phi[2] = (1 + ksi)*(1 + eta)*(-1 + ksi + eta) / 4;
 		phi[3] = (1 - ksi)*(1 + eta)*(-1 - ksi + eta) / 4;
 		phi[4] = (1 - pow(ksi, 2))*(1 - eta) / 2;
-		phi[5] = (ksi + 1)*(1 - pow(eta, 2)) / 2;
+		phi[5] = (1 + ksi)*(1 - pow(eta, 2)) / 2;
 		phi[6] = (1 - pow(ksi, 2))*(1 + eta) / 2;
-		phi[7] = (ksi - 1)*(1 - pow(eta, 2)) / 2;
+		phi[7] = (1 - ksi)*(1 - pow(eta, 2)) / 2;
 
 		dphi(0, 0) = (1 - eta)*(2 * ksi + eta) / 4;			dphi(1, 0) = (1 - ksi)*(ksi + 2 * eta) / 4;
 		dphi(0, 1) = (1 - eta)*(2 * ksi - eta) / 4;			dphi(1, 1) = -(1 + ksi)*(ksi - 2 * eta) / 4;
