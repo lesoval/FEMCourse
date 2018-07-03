@@ -29,17 +29,19 @@
 #include "PostProcess.h"
 #include "PostProcessTemplate.h"
 
-void TestQuad(const int order);
+void TestQuad1(const int order);
+void TestQuad2(const int order);
 void TestTriangle(const int order);
 void PlaneStressTest(const std::string Malha, const int order);
 void VesselTest(const std::string Malha, const int order);
 
 void main()
 {
-	//TestQuad(2);
+	//TestQuad1(2);
+	//TestQuad2(2);
 	//TestTriangle(2);
 	//PlaneStressTest("BasicMesh", 2);
-	VesselTest("Vessel", 2);
+	VesselTest("VesselTriang720", 1);
 
 	system("pause");
 }
@@ -68,14 +70,10 @@ void VesselTest(const std::string Malha, const int order)
 		u[0] = ur * x[0] / r;
 		u[1] = ur * x[1] / r;
 
-		double sigmar = (a*a*pi - b * b*p0) / (b*b - a * a) + (a*a*b*b*(p0 - pi)) / (b*b - a * a) / (r*r);
-		double sigmat = (a*a*pi - b * b*p0) / (b*b - a * a) - (a*a*b*b*(p0 - pi)) / (b*b - a * a) / (r*r);
-
-		double dur = (sigmar - ni * sigmat) / E; double dut = (sigmat - ni * sigmar) / E;
 		du.Resize(3, 1);
-		du(0, 0) = dur * pow(x[0] / r, 2) + dut * pow(x[1] / r, 2);
-		du(1, 0) = dur * pow(x[1] / r, 2) + dut * pow(x[0] / r, 2);
-		du(2, 0) = (du(0, 0) - du(1, 0))*tan(2 * atan(x[1] / x[0]));
+		du(0, 0) = ((a*a*pi - b * b*p0)*(1 - ni) + (a*a*b*b*(p0 - pi)*(1 + ni)*(x[0] * x[0] - x[1] * x[1])) / (r*r*r*r)) / (E*(b*b - a * a));
+		du(1, 0) = ((a*a*pi - b * b*p0)*(1 - ni) + (a*a*b*b*(p0 - pi)*(1 + ni)*(x[1] * x[1] - x[0] * x[0])) / (r*r*r*r)) / (E*(b*b - a * a));
+		du(2, 0) = 4 * x[0] * x[1] / (E*(b*b - a * a))*(a*a*b*b*(p0 - pi)*(1 + ni) / (r*r*r*r));
 	};
 	Elasticity->SetExactSolution(u_exact);
 
@@ -117,6 +115,8 @@ void VesselTest(const std::string Malha, const int order)
 	sol->AppendVariable("Tension");
 	sol->AppendVariable("SolExact");
 	sol->AppendVariable("DSolExact");
+	sol->AppendVariable("Error");
+	sol->AppendVariable("DError");
 
 	an.PostProcessSolution(Malha, *sol);
 
@@ -224,7 +224,7 @@ void TestTriangle(const int order)
 }
 
 //Plane Stress Test Quad - Mixed boundary
-void TestQuad(const int order)
+void TestQuad1(const int order)
 {
 	VecDouble a(3);		a[0] = 0;		a[1] = 0;		a[2] = 0;
 	VecDouble b(3);		b[0] = 0.25;	b[1] = 0;		b[2] = 0;
@@ -282,5 +282,61 @@ void TestQuad(const int order)
 	sol->AppendVariable("Strain");
 	sol->AppendVariable("Tension");
 
-	an.PostProcessSolution("TestQuad", *sol);
+	an.PostProcessSolution("TestQuad1", *sol);
+}
+
+//Plane Stress Test Quad - Mixed boundary
+void TestQuad2(const int order)
+{
+	VecDouble a(3);		a[0] = 0;		a[1] = 0;		a[2] = 0;
+	VecDouble b(3);		b[0] = 0.5;		b[1] = 0;		b[2] = 0;
+	VecDouble c(3);		c[0] = 0.5;		c[1] = 0.25;	c[2] = 0;
+	VecDouble d(3);		d[0] = 0;		d[1] = 0.25;	d[2] = 0;
+
+	GeoMesh gmesh; gmesh.SetNumElements(3); gmesh.SetNumNodes(4);
+	gmesh.Node(0).SetCo(a);
+	gmesh.Node(1).SetCo(b);
+	gmesh.Node(2).SetCo(c);
+	gmesh.Node(3).SetCo(d);
+
+	VecInt Top1(4); Top1[0] = 0; Top1[1] = 1; Top1[2] = 2; Top1[3] = 3;
+	GeoElement *gel1 = new GeoElementTemplate<GeomQuad>(Top1, 1, &gmesh, 0);
+	VecInt Top2(2); Top2[0] = 1; Top2[1] = 2;
+	GeoElement *gel2 = new GeoElementTemplate<Geom1d>(Top2, 2, &gmesh, 1);
+	VecInt Top3(2); Top3[0] = 0; Top3[1] = 3;
+	GeoElement *gel3 = new GeoElementTemplate<Geom1d>(Top3, 3, &gmesh, 2);
+	gmesh.SetElement(0, gel1); gmesh.SetElement(1, gel2); gmesh.SetElement(2, gel3);
+
+	gmesh.BuildConnectivity();
+
+	//gmesh.Print(std::cout);
+	//VTKGeoMesh::PrintGMeshVTK(&gmesh, "GTestQuad.vtk");
+
+	PlaneStressShell *Elasticity = new PlaneStressShell(1, 2.1e8, 0.3, 0.025); Elasticity->SetDimension(2);
+	OnlyForce *Force = new OnlyForce(2); Force->SetDimension(2);
+	auto carga = [](const VecDouble &x, VecDouble &f)
+	{
+		f[0] = 75;
+		f[1] = 0;
+	};
+	Force->SetForceFunction(carga);
+	Restrain *Rest = new Restrain(3); Rest->SetDimension(2);
+
+	CompMesh cmesh(&gmesh); cmesh.SetDefaultOrder(order); cmesh.SetNumberMath(3);
+	cmesh.SetMathStatement(1, Elasticity);
+	cmesh.SetMathStatement(2, Force);
+	cmesh.SetMathStatement(3, Rest);
+	cmesh.AutoBuild();
+
+	Analysis an(&cmesh);
+	an.RunSimulation();
+
+	//VTKGeoMesh::PrintCMeshVTK(&cmesh, 2, "CTestQuad.vtk");
+
+	PostProcess *sol = new PostProcessTemplate<PlaneStrainShell>(&an);
+	sol->AppendVariable("Displacement");
+	sol->AppendVariable("Strain");
+	sol->AppendVariable("Tension");
+
+	an.PostProcessSolution("TestQuad2", *sol);
 }

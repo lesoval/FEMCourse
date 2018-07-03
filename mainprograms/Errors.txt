@@ -1,3 +1,3 @@
-Error -> u = 0.0414993
-Error -> Grad u = 0.0013644
-Error -> u + Grad u = 0.0415217
+Error -> u = 0.0536399
+Error -> Grad u = 0.00197985
+Error -> u + Grad u = 0.0536764
