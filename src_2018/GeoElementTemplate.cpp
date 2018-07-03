@@ -252,7 +252,7 @@ int GeoElementTemplate<TGeom>::WhichSide(VecInt & SideNodeIds)
 
 	case 3:
 
-		for (int i = NCornerNodes(); NSides(); i++)
+		for (int i = NCornerNodes(); i < NSides(); i++)
 		{
 			if (NSideNodes(i) == 3)
 			{
