@@ -23,7 +23,7 @@ class Restrain : public MathStatement
 
 public:
 
-	enum PostProcVar { ENone, ESol, EDSol, EFlux, EForce, ESolExact, EDSolExact };
+	enum PostProcVar { ENone, ESol, EDSol, EFlux, EForce, ESolExact, EDSolExact, EError, EDError };
 
 	//Default constructor of Restrain
 	Restrain();

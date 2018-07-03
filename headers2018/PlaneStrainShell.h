@@ -28,7 +28,7 @@ class PlaneStrainShell : public MathStatement
 
 public:
 
-	enum PostProcVar { ENone, ESol, EDSol, EFlux, EForce, ESolExact, EDSolExact };
+	enum PostProcVar { ENone, ESol, EDSol, EFlux, EForce, ESolExact, EDSolExact, EError, EDError };
 
 	//Default constructor of PlaneStrainShell
 	PlaneStrainShell();
